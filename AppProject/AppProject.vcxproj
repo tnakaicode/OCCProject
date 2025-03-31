@@ -10,7 +10,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{92706C4A-2D2A-48CA-86E6-305D93E60ED7}</ProjectGuid>
+    <ProjectGuid>{PROJECT_GUID}</ProjectGuid>
     <RootNamespace>AppProject</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -29,6 +29,26 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+        TKernel.lib;
+        TKMath.lib;
+        TKBRep.lib;
+        TKG2d.lib;
+        TKG3d.lib;
+        TKGeomBase.lib;
+        TKGeomAlgo.lib;
+        TKPrim.lib;
+        TKTopAlgo.lib;
+        %(AdditionalDependencies)
+      </AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>

@@ -10,7 +10,7 @@
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/AppProject",
       "environment": [],
-      "console": "integratedTerminal",
+      "console": "externalTerminal",
       "preLaunchTask": "build"
     },
     {
