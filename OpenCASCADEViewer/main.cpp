@@ -1,9 +1,9 @@
-//#include <windows.h>
+#include <windows.h>
 //#include <Aspect_DisplayConnection.hxx>
 //#include <OpenGl_GraphicDriver.hxx>
 //#include <V3d_Viewer.hxx>
 //#include <V3d_View.hxx>
-//#include <WNT_Window.hxx>
+#include <WNT_Window.hxx>
 //#include <AIS_InteractiveContext.hxx>
 //#include <AIS_Shape.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
