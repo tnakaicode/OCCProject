@@ -54,6 +54,9 @@
         TKV3d.lib;
         TKBRep.lib;
         TKPrim.lib;
+        TKSTEP.lib;
+        TKSTEPAttr.lib;
+        TKSTEPBase.lib;
         %(AdditionalDependencies)
       </AdditionalDependencies>
     </Link>
