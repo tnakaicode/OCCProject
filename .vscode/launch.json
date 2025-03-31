@@ -5,12 +5,12 @@
       "name": "Debug AppProject",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/AppProject/x64/Debug/AppProject.exe",
+      "program": "${workspaceFolder}/x64/Debug/AppProject.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/AppProject",
       "environment": [],
-      "console": "externalTerminal",
+      "console": "integratedTerminal",
       "preLaunchTask": "build"
     },
     {
