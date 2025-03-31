@@ -46,10 +46,14 @@
         TKMath.lib;
         TKG3d.lib;
         TKG2d.lib;
+        TKGeomBase.lib;
+        TKGeomAlgo.lib;
+        TKTopAlgo.lib;
         TKOpenGl.lib;
         TKService.lib;
         TKV3d.lib;
         TKBRep.lib;
+        TKPrim.lib;
         %(AdditionalDependencies)
       </AdditionalDependencies>
     </Link>
