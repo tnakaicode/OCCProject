@@ -1,14 +1,17 @@
-#include <iostream>
 #include <BRepPrimAPI_MakeBox.hxx>
 #include <TopoDS_Shape.hxx>
 #include <BRepTools.hxx>
 #include <OSD_Environment.hxx>
 #include <gp_Pnt.hxx>
+#include <iostream>
+
+#include <QApplication>
+#include "ViewerWidget.h"
 
 int main() {
     // OpenCASCADEのログをファイルにリダイレクト
-    OSD_Environment logEnvOut("CSF_DefaultStdOut", "log.txt");
-    OSD_Environment logEnvErr("CSF_DefaultStdErr", "error_log.txt");
+    OSD_Environment logEnvOut("CSF_DefaultStdOut", "");
+    OSD_Environment logEnvErr("CSF_DefaultStdErr", "");
 
     std::cout << "OpenCASCADE Example" << std::endl;
 
@@ -27,5 +30,11 @@ int main() {
         std::cerr << "Failed to save box shape" << std::endl;
     }
 
-    return 0;
+    QApplication app(argc, argv);
+
+    ViewerWidget viewer;
+    viewer.resize(800, 600);
+    viewer.show();
+
+    return app.exec();
 }
