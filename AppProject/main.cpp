@@ -6,9 +6,13 @@
 #include <iostream>
 
 #include <QApplication>
-#include "ViewerWidget.h"
+#include <QWidget> // Qtの基本的なウィジェット
+//#include "ViewerWidget.h"
 
 int main(int argc, char *argv[]) {
+    // Qtアプリケーションの初期化
+    QApplication app(argc, argv);
+
     // OpenCASCADEのログをファイルにリダイレクト
     OSD_Environment logEnvOut("CSF_DefaultStdOut", "");
     OSD_Environment logEnvErr("CSF_DefaultStdErr", "");
@@ -30,11 +34,14 @@ int main(int argc, char *argv[]) {
         std::cerr << "Failed to save box shape" << std::endl;
     }
 
-    QApplication app(argc, argv);
+    // Qtアプリケーションの初期化
+    //QApplication app(argc, argv);
 
-    //ViewerWidget viewer;
-    //viewer.resize(800, 600);
-    //viewer.show();
+    // シンプルなウィジェットを作成して表示
+    QWidget widget;
+    widget.resize(800, 600); // ウィジェットのサイズを設定
+    widget.setWindowTitle("Qt Widget Example"); // ウィンドウタイトルを設定
+    widget.show(); // ウィジェットを表示
 
     return app.exec();
 }

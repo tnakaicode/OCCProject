@@ -5,18 +5,35 @@
       "name": "Debug AppProject",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/x64/Debug/AppProject.exe",
+      "program": "${workspaceFolder}/AppProject/x64/Debug/AppProject.exe",
       "args": [],
-      "stopAtEntry": false,
+      "stopAtEntry": true,
       "cwd": "${workspaceFolder}/AppProject",
       "environment": [
         {
             "name": "PATH",
-            "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\win64\\vc14\\bin;%PATH%"
+            "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\win64\\vc14\\bin;C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\bin;%PATH%"
         }
     ],
       "console": "externalTerminal",
       "preLaunchTask": "build"
+    },
+    {
+      "name": "Debug QtProject",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/QtProject/x64/Debug/QtProject.exe",
+      "args": [],
+      "stopAtEntry": true,
+      "cwd": "${workspaceFolder}/QtProject",
+      "environment": [
+        {
+            "name": "PATH",
+            "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\win64\\vc14\\bin;C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\bin;%PATH%"
+        }
+    ],
+      "console": "externalTerminal",
+      "preLaunchTask": "build-qt"
     },
     {
       "name": "C/C++ Runner: Debug Session",

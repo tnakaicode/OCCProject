@@ -10,8 +10,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{92706C4A-2D2A-48CA-86E6-305D93E60ED7}</ProjectGuid>
-    <RootNamespace>AppProject</RootNamespace>
+    <ProjectGuid>{E3CE3FB0-E402-45D3-90E2-D04A7A46EDAA}</ProjectGuid>
+    <RootNamespace>QtProject</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -20,7 +20,6 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
-    <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -33,7 +32,6 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>
-        C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\inc;
         C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include;
         C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtWidgets;
         C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtCore;
@@ -43,21 +41,10 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>
-        C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\lib;
         C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\lib;
         %(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>
-        TKernel.lib;
-        TKMath.lib;
-        TKBRep.lib;
-        TKGeomBase.lib;
-        TKGeomAlgo.lib;
-        TKPrim.lib;
-        TKTopAlgo.lib;
-        TKV3d.lib;
-        TKService.lib;
-        TKOpenGl.lib;
         Qt5Core.lib;
         Qt5Gui.lib;
         Qt5Widgets.lib;
