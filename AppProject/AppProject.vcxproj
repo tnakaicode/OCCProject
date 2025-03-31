@@ -55,6 +55,7 @@
         TKPrim.lib;
         TKTopAlgo.lib;
         TKV3d.lib;
+        TKService.lib;
         TKOpenGl.lib;
         Qt5Core.lib;
         Qt5Gui.lib;

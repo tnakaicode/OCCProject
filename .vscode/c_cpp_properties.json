@@ -6,8 +6,11 @@
           "${workspaceFolder}/**",
           "${workspaceFolder}/AppProject/**",
           "C:/OpenCASCADE-7.7.0-vc14-64/opencascade-7.7.0/inc",
-          "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include"
-      ],
+          "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include",
+          "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtWidgets",
+          "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtCore",
+          "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtGui"
+        ],
       "defines": [
           "_DEBUG",
           "UNICODE",
