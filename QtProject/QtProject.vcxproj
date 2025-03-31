@@ -20,6 +20,10 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <LocalDebuggerEnvironment>
+      PATH=C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\bin;C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\plugins\platforms;%PATH%
+    </LocalDebuggerEnvironment>
+    <LocalDebuggerMergeEnvironment>true</LocalDebuggerMergeEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -27,6 +31,10 @@
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <LocalDebuggerEnvironment>
+      PATH=C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\bin;%PATH%
+    </LocalDebuggerEnvironment>
+    <LocalDebuggerMergeEnvironment>true</LocalDebuggerMergeEnvironment>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

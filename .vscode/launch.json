@@ -12,7 +12,7 @@
       "environment": [
         {
             "name": "PATH",
-            "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\win64\\vc14\\bin;C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\bin;%PATH%"
+            "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\win64\\vc14\\bin;C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\bin;C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\plugins\\platforms;%PATH%"
         }
     ],
       "console": "externalTerminal",
@@ -29,7 +29,7 @@
       "environment": [
         {
             "name": "PATH",
-            "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\win64\\vc14\\bin;C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\bin;%PATH%"
+            "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\bin;C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\plugins\\platforms;%PATH%"
         }
     ],
       "console": "externalTerminal",

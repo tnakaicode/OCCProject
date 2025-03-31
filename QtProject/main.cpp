@@ -1,7 +1,14 @@
 #include <QApplication>
 #include <QWidget>
+#include <iostream>
 
 int main(int argc, char *argv[]) {
+    std::cout << argc << std::endl;
+    std::cout << argv << std::endl;
+    for (int i = 0; i < 5; ++i) {
+        std::cout << i << std::endl;
+    }
+
     // Qtアプリケーションの初期化
     QApplication app(argc, argv);
 
