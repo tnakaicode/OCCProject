@@ -27,7 +27,22 @@
             ],
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": false
+            },
+            "problemMatcher": ["$msCompile"]
+        },
+        {
+            "label": "build-opencascade-viewer",
+            "type": "shell",
+            "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "${workspaceFolder}/OpenCASCADEViewer/OpenCASCADEViewer.vcxproj",
+                "/property:Configuration=Debug",
+                "/property:Platform=x64"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
             },
             "problemMatcher": ["$msCompile"]
         },

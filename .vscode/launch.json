@@ -53,6 +53,23 @@
           "ignoreFailures": true
         }
       ]
+    },
+    {
+      "name": "Debug OpenCASCADEViewer",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/OpenCASCADEViewer/x64/Debug/OpenCASCADEViewer.exe",
+      "args": [],
+      "stopAtEntry": true,
+      "cwd": "${workspaceFolder}/OpenCASCADEViewer",
+      "environment": [
+        {
+            "name": "PATH",
+            "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\win64\\vc14\\bin;%PATH%"
+        }
+    ],
+      "console": "externalTerminal",
+      "preLaunchTask": "build-opencascade-viewer"
     }
   ]
 }
