@@ -9,7 +9,12 @@
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/AppProject",
-      "environment": [],
+      "environment": [
+        {
+            "name": "PATH",
+            "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\win64\\vc14\\bin;%PATH%"
+        }
+    ],
       "console": "externalTerminal",
       "preLaunchTask": "build"
     },

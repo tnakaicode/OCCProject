@@ -10,7 +10,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{PROJECT_GUID}</ProjectGuid>
+    <ProjectGuid>{92706C4A-2D2A-48CA-86E6-305D93E60ED7}</ProjectGuid>
     <RootNamespace>AppProject</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -39,8 +39,6 @@
         TKernel.lib;
         TKMath.lib;
         TKBRep.lib;
-        TKG2d.lib;
-        TKG3d.lib;
         TKGeomBase.lib;
         TKGeomAlgo.lib;
         TKPrim.lib;

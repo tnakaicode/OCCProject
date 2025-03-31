@@ -15,6 +15,22 @@
                 "isDefault": true
             },
             "problemMatcher": ["$msCompile"]
+        },
+        {
+            "label": "deactivate-conda",
+            "type": "shell",
+            "command": "conda",
+            "args": ["deactivate"],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "build-and-deactivate",
+            "dependsOn": ["build", "deactivate-conda"],
+            "problemMatcher": []
         }
     ]
 }
