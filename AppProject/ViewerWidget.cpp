@@ -1,7 +1,9 @@
 #include "ViewerWidget.h"
+#include <Aspect_DisplayConnection.hxx>
 #include <OpenGl_GraphicDriver.hxx>
 #include <WNT_Window.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
+#include <AIS_Shape.hxx>
 #include <QResizeEvent>
 #include <QPaintEvent>
 #include <QPainter>
@@ -15,7 +17,8 @@ ViewerWidget::~ViewerWidget() {}
 
 void ViewerWidget::initializeOpenCASCADE() {
     // OpenCASCADEの初期化
-    Handle(Graphic3d_GraphicDriver) graphicDriver = new OpenGl_GraphicDriver();
+    Handle(Aspect_DisplayConnection) displayConnection = new Aspect_DisplayConnection();
+    Handle(Graphic3d_GraphicDriver) graphicDriver = new OpenGl_GraphicDriver(displayConnection);
     Handle(V3d_Viewer) viewer = new V3d_Viewer(graphicDriver);
     m_view = viewer->CreateView();
     m_context = new AIS_InteractiveContext(viewer);

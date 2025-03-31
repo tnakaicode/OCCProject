@@ -8,7 +8,7 @@
 #include <QApplication>
 #include "ViewerWidget.h"
 
-int main() {
+int main(int argc, char *argv[]) {
     // OpenCASCADEのログをファイルにリダイレクト
     OSD_Environment logEnvOut("CSF_DefaultStdOut", "");
     OSD_Environment logEnvErr("CSF_DefaultStdErr", "");

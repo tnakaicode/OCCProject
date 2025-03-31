@@ -7,7 +7,7 @@
 #include <Aspect_Handle.hxx>
 
 class ViewerWidget : public QWidget {
-    Q_OBJECT
+    Q_OBJECT  // このマクロが必要です
 
 public:
     explicit ViewerWidget(QWidget *parent = nullptr);
