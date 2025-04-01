@@ -40,7 +40,7 @@ int main()
 {
     // Windows ウィンドウの初期化
     HINSTANCE hInstance = GetModuleHandle(nullptr);
-    const char* className = "OpenCASCADEViewer";
+    const wchar_t* className = L"OpenCASCADEViewer"; // Unicode 文字列に変更
 
     WNDCLASS wc = {};
     wc.lpfnWndProc = WndProc;
@@ -53,7 +53,7 @@ int main()
     }
 
     HWND hwnd = CreateWindowEx(
-        0, className, "OpenCASCADE Viewer",
+        0, className, L"OpenCASCADE Viewer", // Unicode 文字列に変更
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600,
         nullptr, nullptr, hInstance, nullptr);
 
