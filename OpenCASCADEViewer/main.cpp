@@ -14,9 +14,57 @@
 #include <OSD_Environment.hxx>
 #include <iostream>
 
+// グローバル変数
+Handle(V3d_Viewer) viewer;
+Handle(V3d_View) view;
+Handle(AIS_InteractiveContext) context;
+
+// ウィンドウプロシージャ
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    switch (msg) {
+    case WM_PAINT:
+        if (!view.IsNull()) {
+            view->Redraw();
+        }
+        break;
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hwnd, msg, wParam, lParam);
+    }
+    return 0;
+}
+
 int main()
 {
-    // OpenCASCADEの初期化
+    // Windows ウィンドウの初期化
+    HINSTANCE hInstance = GetModuleHandle(nullptr);
+    const char* className = "OpenCASCADEViewer";
+
+    WNDCLASS wc = {};
+    wc.lpfnWndProc = WndProc;
+    wc.hInstance = hInstance;
+    wc.lpszClassName = className;
+
+    if (!RegisterClass(&wc)) {
+        std::cerr << "Failed to register window class." << std::endl;
+        return 1;
+    }
+
+    HWND hwnd = CreateWindowEx(
+        0, className, "OpenCASCADE Viewer",
+        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600,
+        nullptr, nullptr, hInstance, nullptr);
+
+    if (!hwnd) {
+        std::cerr << "Failed to create window." << std::endl;
+        return 1;
+    }
+
+    ShowWindow(hwnd, SW_SHOW);
+
+    // OpenCASCADE の初期化
     std::cout << "Program started." << std::endl;
 
     // OpenCASCADEのログをファイルにリダイレクト
@@ -24,9 +72,29 @@ int main()
     OSD_Environment logEnvErr("CSF_DefaultStdErr", "");
 
     Handle(Aspect_DisplayConnection) displayConnection = new Aspect_DisplayConnection();
+    Handle(OpenGl_GraphicDriver) graphicDriver = new OpenGl_GraphicDriver(displayConnection);
+
+    viewer = new V3d_Viewer(graphicDriver);
+    viewer->SetDefaultLights();
+    viewer->SetLightOn();
+
+    view = viewer->CreateView();
+    Handle(WNT_Window) wntWindow = new WNT_Window(hwnd);
+    view->SetWindow(wntWindow);
+
+    if (!wntWindow->IsMapped()) {
+        wntWindow->Map();
+    }
+
+    context = new AIS_InteractiveContext(viewer);
 
     // シンプルな形状（ボックス）を作成
     TopoDS_Shape box = BRepPrimAPI_MakeBox(100.0, 50.0, 30.0).Shape();
+    Handle(AIS_Shape) aisBox = new AIS_Shape(box);
+    context->Display(aisBox, Standard_True);
+
+    view->FitAll();
+
     // ボックスをファイルに保存
     if (BRepTools::Write(box, "box.brep"))
     {
@@ -56,6 +124,13 @@ int main()
     }
 
     std::cout << "STEP file successfully written to " << stepFileName << std::endl;
+
+    // メッセージループ
+    MSG msg = {};
+    while (GetMessage(&msg, nullptr, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 
     return 0;
 }
