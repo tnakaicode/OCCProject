@@ -40,6 +40,11 @@
                 "/property:Configuration=Debug",
                 "/property:Platform=x64"
             ],
+            "presentation": {
+                "reveal": "always", // ターミナルを表示
+                "panel": "shared",  // 同じターミナルを使用
+                "clear": false      // ターミナルをクリアしない
+            },
             "group": {
                 "kind": "build",
                 "isDefault": false

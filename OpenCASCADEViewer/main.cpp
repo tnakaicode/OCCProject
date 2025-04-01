@@ -1,11 +1,11 @@
 #include <windows.h>
-#include <WNT_Window.hxx>
 #include <Aspect_DisplayConnection.hxx>
-//#include <AIS_InteractiveContext.hxx>
-//#include <AIS_Shape.hxx>
+//#include <OpenGl_GraphicDriver.hxx>
 //#include <V3d_Viewer.hxx>
 //#include <V3d_View.hxx>
-//#include <OpenGl_GraphicDriver.hxx>
+//#include <WNT_Window.hxx>
+//#include <AIS_InteractiveContext.hxx>
+//#include <AIS_Shape.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
 #include <BRepTools.hxx>
 #include <STEPControl_Writer.hxx>
@@ -21,6 +21,8 @@ int main()
     // OpenCASCADEのログをファイルにリダイレクト
     OSD_Environment logEnvOut("CSF_DefaultStdOut", "");
     OSD_Environment logEnvErr("CSF_DefaultStdErr", "");
+
+    Handle(Aspect_DisplayConnection) displayConnection = new Aspect_DisplayConnection();
 
     // シンプルな形状（ボックス）を作成
     TopoDS_Shape box = BRepPrimAPI_MakeBox(100.0, 50.0, 30.0).Shape();

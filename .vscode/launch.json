@@ -69,6 +69,13 @@
         }
     ],
       "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen", // デバッグ用コンソールを開かない
+      "presentation": {
+        "hidden": false,
+        "group": "",
+        "order": 1,
+        "clear": false // ターミナルをクリアしない
+      },
       "preLaunchTask": "build-opencascade-viewer"
     }
   ]
