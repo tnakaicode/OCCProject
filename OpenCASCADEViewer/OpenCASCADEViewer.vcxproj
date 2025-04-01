@@ -41,8 +41,30 @@
         C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\lib;
         %(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
-      <AdditionalDependencies>TKernel.lib;TKMath.lib;TKG3d.lib;TKG2d.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKTopAlgo.lib;TKOpenGl.lib;TKService.lib;TKV3d.lib;TKBRep.lib;TKPrim.lib;TKSTEP.lib;TKSTEPAttr.lib;TKSTEPBase.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>
+        TKernel.lib;
+        TKMath.lib;
+        TKG3d.lib;
+        TKG2d.lib;
+        TKGeomBase.lib;
+        TKGeomAlgo.lib;
+        TKTopAlgo.lib;
+        TKOpenGl.lib;
+        TKService.lib;
+        TKV3d.lib;
+        TKBRep.lib;
+        TKPrim.lib;
+        TKSTEP.lib;
+        TKSTEPAttr.lib;
+        TKSTEPBase.lib;
+        %(AdditionalDependencies)
+      </AdditionalDependencies>
+      <LinkStatus>true</LinkStatus>
+      <SubSystem>Console</SubSystem>
     </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

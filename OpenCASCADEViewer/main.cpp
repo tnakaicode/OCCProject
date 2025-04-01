@@ -1,11 +1,11 @@
 #include <windows.h>
 #include <Aspect_DisplayConnection.hxx>
-//#include <OpenGl_GraphicDriver.hxx>
-//#include <V3d_Viewer.hxx>
-//#include <V3d_View.hxx>
-//#include <WNT_Window.hxx>
-//#include <AIS_InteractiveContext.hxx>
-//#include <AIS_Shape.hxx>
+#include <OpenGl_GraphicDriver.hxx>
+#include <V3d_Viewer.hxx>
+#include <V3d_View.hxx>
+#include <WNT_Window.hxx>
+#include <AIS_InteractiveContext.hxx>
+#include <AIS_Shape.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
 #include <BRepTools.hxx>
 #include <STEPControl_Writer.hxx>
@@ -17,6 +17,7 @@
 int main()
 {
     // OpenCASCADEの初期化
+    std::cout << "Program started." << std::endl;
 
     // OpenCASCADEのログをファイルにリダイレクト
     OSD_Environment logEnvOut("CSF_DefaultStdOut", "");
