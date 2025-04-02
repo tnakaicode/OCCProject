@@ -29,7 +29,7 @@
                 "kind": "build",
                 "isDefault": false
             },
-            "dependsOn": ["build-qt-clean"], // ビルド前にクリーンを実行
+            //"dependsOn": ["build-qt-clean"], // ビルド前にクリーンを実行
             "problemMatcher": ["$msCompile"]
         },
         {

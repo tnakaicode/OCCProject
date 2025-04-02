@@ -9,6 +9,7 @@
 #include <AIS_Shape.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
 #include <TopoDS_Shape.hxx>
+#include <Quantity_Color.hxx>
 
 class ViewerWidget : public QWidget
 {
@@ -19,7 +20,7 @@ public:
     ~ViewerWidget();
 
     // ボックスや他の形状を表示するためのメソッド
-    void displayShape(const TopoDS_Shape &shape, double transparency = 0.0);
+    void displayShape(const TopoDS_Shape &shape, double transparency = 0.0, const Quantity_Color *faceColor = nullptr, const Quantity_Color *edgeColor = nullptr);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

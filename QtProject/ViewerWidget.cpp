@@ -37,15 +37,21 @@ ViewerWidget::ViewerWidget(QWidget *parent)
 
 ViewerWidget::~ViewerWidget() {}
 
-void ViewerWidget::displayShape(const TopoDS_Shape &shape, double transparency)
+void ViewerWidget::displayShape(const TopoDS_Shape &shape, double transparency, const Quantity_Color *faceColor, const Quantity_Color *edgeColor)
 {
     Handle(AIS_Shape) aisShape = new AIS_Shape(shape);
 
-    // フェイスの色を設定（例: 青色）
-    // m_context->SetColor(aisShape, Quantity_NOC_BLUE1, AIS_Shaded);
+    // フェイスの色を設定（指定がある場合のみ）
+    if (faceColor)
+    {
+        m_context->SetColor(aisShape, *faceColor, AIS_Shaded);
+    }
 
-    // エッジの色を設定（例: 黒色）
-    // m_context->SetColor(aisShape, Quantity_NOC_BLACK, AIS_WireFrame);
+    // エッジの色を設定（指定がある場合のみ）
+    if (edgeColor)
+    {
+        m_context->SetColor(aisShape, *edgeColor, AIS_WireFrame);
+    }
 
     // 透過度を設定 (0.0 = 不透明, 1.0 = 完全に透明)
     aisShape->SetTransparency(transparency);
