@@ -68,8 +68,12 @@ void ViewerWidget::loadStepFile(const char *filePath)
 
     // STEP ファイルを読み込む
     STEPCAFControl_Reader reader;
+    // reader.SetLayerMode(true);
     reader.SetColorMode(true);
     reader.SetNameMode(true);
+    reader.SetMatMode(true);
+    // reader.SetGDTMode(true);
+    // reader.SetViewMode(true);
 
     IFSelect_ReturnStatus status = reader.ReadFile(filePath);
     if (status != IFSelect_RetDone)
@@ -88,9 +92,12 @@ void ViewerWidget::loadStepFile(const char *filePath)
     // ルート形状を取得
     TDF_LabelSequence freeShapes;
     shapeTool->GetFreeShapes(freeShapes);
+    std::cout << "STEP File FreeShape Tree Structure:" << freeShapes.Length() << std::endl;
+
+    shapeTool->GetShapes(freeShapes);
+    std::cout << "STEP File Shape     Tree Structure:" << freeShapes.Length() << std::endl;
 
     // ツリー構造を出力
-    std::cout << "STEP File Tree Structure:" << std::endl;
     for (Standard_Integer i = 1; i <= freeShapes.Length(); i++)
     {
         TDF_Label rootLabel = freeShapes.Value(i);
@@ -127,6 +134,7 @@ void ViewerWidget::displayShapeWithColors(const TDF_Label &label, const Handle(X
             }
 
             // 形状を表示
+            m_context->SetDisplayMode(aisShape, AIS_Shaded, Standard_True);
             m_context->Display(aisShape, Standard_True);
         }
     }
@@ -167,6 +175,7 @@ void ViewerWidget::printLabelTree(const TDF_Label &label, const Handle(XCAFDoc_S
         printLabelTree(children.Value(i), shapeTool, colorTool, depth + 1);
     }
 }
+
 void ViewerWidget::displayShape(const TopoDS_Shape &shape, double transparency, const Quantity_Color *faceColor, const Quantity_Color *edgeColor)
 {
     Handle(AIS_Shape) aisShape = new AIS_Shape(shape);
@@ -243,11 +252,11 @@ void ViewerWidget::wheelEvent(QWheelEvent *event)
         int delta = event->angleDelta().y();
         if (delta > 0)
         {
-            m_view->SetZoom(0.9); // ズームイン
+            m_view->SetZoom(1.1); // ズームイン
         }
         else
         {
-            m_view->SetZoom(1.1); // ズームアウト
+            m_view->SetZoom(0.9); // ズームアウト
         }
     }
 }
