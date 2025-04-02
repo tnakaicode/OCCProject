@@ -1,4 +1,4 @@
-#define _WIN32_WINNT 0x0601 // Windows 7 以降をターゲットに設定
+#define _WIN32_WINNT 0x0601 // Target Windows 7 or later
 #include <windows.h>
 #include <Aspect_DisplayConnection.hxx>
 #include <OpenGl_GraphicDriver.hxx>
@@ -209,8 +209,11 @@ int main()
         std::cerr << "Error: Failed to write STEP file." << std::endl;
         return 1;
     }
-
-    std::cout << "STEP file successfully written to " << stepFileName << std::endl;
+    else
+    {
+        std::cout << "STEP file written successfully." << std::endl;
+        std::cout << "STEP file successfully written to " << stepFileName << std::endl;
+    }
 
     // メッセージループ
     MSG msg = {};
