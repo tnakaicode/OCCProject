@@ -3,10 +3,20 @@
 #include <OpenGl_GraphicDriver.hxx>
 #include <WNT_Window.hxx>
 #include <AIS_Shape.hxx>
+#include <STEPControl_Reader.hxx>
+#include <TDocStd_Document.hxx>
+#include <XCAFDoc_DocumentTool.hxx>
+#include <XCAFDoc_ShapeTool.hxx>
+#include <XCAFDoc_ColorTool.hxx>
+#include <TDF_LabelSequence.hxx>
+#include <TDF_Label.hxx>
 #include <QResizeEvent>
 #include <QPaintEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QFile>
+#include <QMessageBox>
+#include <iostream>
 
 ViewerWidget::ViewerWidget(QWidget *parent)
     : QWidget(parent)
@@ -16,11 +26,11 @@ ViewerWidget::ViewerWidget(QWidget *parent)
     Handle(OpenGl_GraphicDriver) graphicDriver = new OpenGl_GraphicDriver(displayConnection);
 
     // ビューアとビューの作成
-    Handle(V3d_Viewer) viewer = new V3d_Viewer(graphicDriver);
-    viewer->SetDefaultLights();
-    viewer->SetLightOn();
+    m_viewer = new V3d_Viewer(graphicDriver);
+    m_viewer->SetDefaultLights();
+    m_viewer->SetLightOn();
 
-    m_view = viewer->CreateView();
+    m_view = m_viewer->CreateView();
     Handle(WNT_Window) wntWindow = new WNT_Window((Aspect_Handle)winId());
     m_view->SetWindow(wntWindow);
 
@@ -30,12 +40,39 @@ ViewerWidget::ViewerWidget(QWidget *parent)
     }
 
     // 描画コンテキストの作成
-    m_context = new AIS_InteractiveContext(viewer);
+    m_context = new AIS_InteractiveContext(m_viewer);
 
     m_view->FitAll();
 }
 
 ViewerWidget::~ViewerWidget() {}
+
+void ViewerWidget::loadStepFile(const char* filePath)
+{
+    // STEP ファイルを読み込む
+    STEPControl_Reader reader;
+    IFSelect_ReturnStatus status = reader.ReadFile(filePath);
+    if (status != IFSelect_RetDone)
+    {
+        std::cerr << "Failed to read STEP file: " << filePath << std::endl;
+        return;
+    }
+
+    // STEP ファイルから形状を取得
+    reader.TransferRoots();
+    TopoDS_Shape shape = reader.OneShape();
+
+    if (shape.IsNull())
+    {
+        std::cerr << "No valid shape found in STEP file: " << filePath << std::endl;
+        return;
+    }
+
+    // 形状を表示
+    Handle(AIS_Shape) aisShape = new AIS_Shape(shape);
+    m_context->Display(aisShape, Standard_True);
+    m_view->FitAll();
+}
 
 void ViewerWidget::displayShape(const TopoDS_Shape &shape, double transparency, const Quantity_Color *faceColor, const Quantity_Color *edgeColor)
 {

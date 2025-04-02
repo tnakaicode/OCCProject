@@ -22,6 +22,9 @@ public:
     // ボックスや他の形状を表示するためのメソッド
     void displayShape(const TopoDS_Shape &shape, double transparency = 0.0, const Quantity_Color *faceColor = nullptr, const Quantity_Color *edgeColor = nullptr);
 
+    // STEP ファイルを読み込んで表示するメソッド
+    void loadStepFile(const char* filePath);
+
 protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;

@@ -87,7 +87,29 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\lib;C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>TKernel.lib;TKMath.lib;TKG2d.lib;TKG3d.lib;TKBRep.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKTopAlgo.lib;TKV3d.lib;TKOpenGl.lib;TKService.lib;TKPrim.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>
+        TKernel.lib;
+        TKMath.lib;
+        TKG2d.lib;
+        TKG3d.lib;
+        TKBRep.lib;
+        TKGeomBase.lib;
+        TKGeomAlgo.lib;
+        TKTopAlgo.lib;
+        TKV3d.lib;
+        TKOpenGl.lib;
+        TKService.lib;
+        TKPrim.lib;
+        TKSTEP.lib;
+        TKSTEPAttr.lib;
+        TKSTEP209.lib;
+        TKSTEPBase.lib;
+        TKXSBase.lib;
+        TKXDESTEP.lib;
+        TKXCAF.lib;
+        TKLCAF.lib;
+        %(AdditionalDependencies)
+      </AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <LinkStatus>true</LinkStatus>
       <PreventDllBinding>true</PreventDllBinding>
