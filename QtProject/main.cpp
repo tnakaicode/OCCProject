@@ -2,7 +2,8 @@
 #include <QApplication>
 #include <BRepPrimAPI_MakeBox.hxx> // OpenCASCADE のボックス作成用クラス
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
     QApplication app(argc, argv);
 
     ViewerWidget viewer;
