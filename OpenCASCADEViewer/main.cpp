@@ -24,18 +24,20 @@ Handle(V3d_View) view;
 Handle(AIS_InteractiveContext) context;
 
 // ウィンドウプロシージャ
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    static bool isDragging = false; // ドラッグ中かどうか
-    static bool isPanning = false;  // パン操作中かどうか
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    static bool isDragging = false;  // ドラッグ中かどうか
+    static bool isPanning = false;   // パン操作中かどうか
     static int lastX = 0, lastY = 0; // 前回のマウス位置
 
-    switch (msg) {
+    switch (msg)
+    {
     case WM_LBUTTONDOWN: // 左クリック押下
         isDragging = true;
         lastX = LOWORD(lParam);
         lastY = HIWORD(lParam);
         view->StartRotation(lastX, lastY); // 回転の開始
-        SetCapture(hwnd); // マウスキャプチャを開始
+        SetCapture(hwnd);                  // マウスキャプチャを開始
         break;
 
     case WM_LBUTTONUP: // 左クリック解放
@@ -56,13 +58,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         break;
 
     case WM_MOUSEMOVE: // マウス移動
-        if (isDragging && !view.IsNull()) {
+        if (isDragging && !view.IsNull())
+        {
             int x = LOWORD(lParam);
             int y = HIWORD(lParam);
             view->Rotation(x, y); // 回転操作
             lastX = x;
             lastY = y;
-        } else if (isPanning && !view.IsNull()) {
+        }
+        else if (isPanning && !view.IsNull())
+        {
             int x = LOWORD(lParam);
             int y = HIWORD(lParam);
             double dx = static_cast<double>(x - lastX);
@@ -74,11 +79,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         break;
 
     case WM_MOUSEWHEEL: // マウスホイール
-        if (!view.IsNull()) {
+        if (!view.IsNull())
+        {
             int delta = GET_WHEEL_DELTA_WPARAM(wParam);
-            if (delta > 0) {
+            if (delta > 0)
+            {
                 view->SetZoom(0.9); // ズームイン
-            } else {
+            }
+            else
+            {
                 view->SetZoom(1.1); // ズームアウト
             }
         }
@@ -98,14 +107,15 @@ int main()
 {
     // Windows ウィンドウの初期化
     HINSTANCE hInstance = GetModuleHandle(nullptr);
-    const wchar_t* className = L"OpenCASCADEViewer"; // Unicode 文字列に変更
+    const wchar_t *className = L"OpenCASCADEViewer"; // Unicode 文字列に変更
 
     WNDCLASS wc = {};
     wc.lpfnWndProc = WndProc;
     wc.hInstance = hInstance;
     wc.lpszClassName = className;
 
-    if (!RegisterClass(&wc)) {
+    if (!RegisterClass(&wc))
+    {
         std::cerr << "Failed to register window class." << std::endl;
         return 1;
     }
@@ -115,7 +125,8 @@ int main()
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600,
         nullptr, nullptr, hInstance, nullptr);
 
-    if (!hwnd) {
+    if (!hwnd)
+    {
         std::cerr << "Failed to create window." << std::endl;
         return 1;
     }
@@ -140,27 +151,28 @@ int main()
     Handle(WNT_Window) wntWindow = new WNT_Window(hwnd);
     view->SetWindow(wntWindow);
 
-    if (!wntWindow->IsMapped()) {
+    if (!wntWindow->IsMapped())
+    {
         wntWindow->Map();
     }
 
     context = new AIS_InteractiveContext(viewer);
 
-    Graphic3d_RenderingParams& params = view->ChangeRenderingParams();
+    Graphic3d_RenderingParams &params = view->ChangeRenderingParams();
     params.IsTransparentShadowEnabled = Standard_True; // 透過影を有効化
 
     // シンプルな形状（ボックス）を作成
     TopoDS_Shape box = BRepPrimAPI_MakeBox(100.0, 50.0, 30.0).Shape();
     Handle(AIS_Shape) aisBox = new AIS_Shape(box);
-    
+
     // 表示属性を設定
     Handle(Prs3d_ShadingAspect) shadingAspect = new Prs3d_ShadingAspect();
-    shadingAspect->SetTransparency(0.5); // 透過率（0.0 = 不透明、1.0 = 完全透明）
+    shadingAspect->SetTransparency(0.5);         // 透過率（0.0 = 不透明、1.0 = 完全透明）
     shadingAspect->SetColor(Quantity_NOC_BLUE1); // ボックスの色
     aisBox->Attributes()->SetShadingAspect(shadingAspect);
 
     // 表面とエッジを表示
-    context->SetDisplayMode(aisBox, AIS_Shaded, Standard_False); // 表面を表示
+    context->SetDisplayMode(aisBox, AIS_Shaded, Standard_False);   // 表面を表示
     context->SetDisplayMode(aisBox, AIS_WireFrame, Standard_True); // エッジを表示
 
     // ボックスを表示
@@ -183,7 +195,8 @@ int main()
 
     // 形状をSTEPファイルに追加
     IFSelect_ReturnStatus status = stepWriter.Transfer(box, STEPControl_AsIs);
-    if (status != IFSelect_RetDone) {
+    if (status != IFSelect_RetDone)
+    {
         std::cerr << "Error: Failed to transfer shape to STEP writer." << std::endl;
         return 1;
     }
@@ -191,7 +204,8 @@ int main()
     // STEPファイルに書き出し
     Standard_CString stepFileName = "box.stp";
     status = stepWriter.Write(stepFileName);
-    if (status != IFSelect_RetDone) {
+    if (status != IFSelect_RetDone)
+    {
         std::cerr << "Error: Failed to write STEP file." << std::endl;
         return 1;
     }
@@ -200,7 +214,8 @@ int main()
 
     // メッセージループ
     MSG msg = {};
-    while (GetMessage(&msg, nullptr, 0, 0)) {
+    while (GetMessage(&msg, nullptr, 0, 0))
+    {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
