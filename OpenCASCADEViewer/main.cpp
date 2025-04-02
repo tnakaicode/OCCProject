@@ -1,3 +1,4 @@
+#define _WIN32_WINNT 0x0601 // Windows 7 以降をターゲットに設定
 #include <windows.h>
 #include <Aspect_DisplayConnection.hxx>
 #include <OpenGl_GraphicDriver.hxx>
@@ -12,6 +13,9 @@
 #include <gp_Pnt.hxx>
 #include <Quantity_NameOfColor.hxx>
 #include <OSD_Environment.hxx>
+#include <Graphic3d_AspectFillArea3d.hxx>
+#include <Prs3d_ShadingAspect.hxx>
+#include <Quantity_Color.hxx>
 #include <iostream>
 
 // グローバル変数
@@ -21,15 +25,69 @@ Handle(AIS_InteractiveContext) context;
 
 // ウィンドウプロシージャ
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    static bool isDragging = false; // ドラッグ中かどうか
+    static bool isPanning = false;  // パン操作中かどうか
+    static int lastX = 0, lastY = 0; // 前回のマウス位置
+
     switch (msg) {
-    case WM_PAINT:
-        if (!view.IsNull()) {
-            view->Redraw();
+    case WM_LBUTTONDOWN: // 左クリック押下
+        isDragging = true;
+        lastX = LOWORD(lParam);
+        lastY = HIWORD(lParam);
+        view->StartRotation(lastX, lastY); // 回転の開始
+        SetCapture(hwnd); // マウスキャプチャを開始
+        break;
+
+    case WM_LBUTTONUP: // 左クリック解放
+        isDragging = false;
+        ReleaseCapture(); // マウスキャプチャを解除
+        break;
+
+    case WM_RBUTTONDOWN: // 右クリック押下
+        isPanning = true;
+        lastX = LOWORD(lParam);
+        lastY = HIWORD(lParam);
+        SetCapture(hwnd); // マウスキャプチャを開始
+        break;
+
+    case WM_RBUTTONUP: // 右クリック解放
+        isPanning = false;
+        ReleaseCapture(); // マウスキャプチャを解除
+        break;
+
+    case WM_MOUSEMOVE: // マウス移動
+        if (isDragging && !view.IsNull()) {
+            int x = LOWORD(lParam);
+            int y = HIWORD(lParam);
+            view->Rotation(x, y); // 回転操作
+            lastX = x;
+            lastY = y;
+        } else if (isPanning && !view.IsNull()) {
+            int x = LOWORD(lParam);
+            int y = HIWORD(lParam);
+            double dx = static_cast<double>(x - lastX);
+            double dy = static_cast<double>(y - lastY);
+            view->Pan(dx, dy); // パン操作
+            lastX = x;
+            lastY = y;
         }
         break;
+
+    case WM_MOUSEWHEEL: // マウスホイール
+        if (!view.IsNull()) {
+            int delta = GET_WHEEL_DELTA_WPARAM(wParam);
+            if (delta > 0) {
+                view->SetZoom(0.9); // ズームイン
+            } else {
+                view->SetZoom(1.1); // ズームアウト
+            }
+        }
+        break;
+
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
+
     default:
         return DefWindowProc(hwnd, msg, wParam, lParam);
     }
@@ -88,9 +146,24 @@ int main()
 
     context = new AIS_InteractiveContext(viewer);
 
+    Graphic3d_RenderingParams& params = view->ChangeRenderingParams();
+    params.IsTransparentShadowEnabled = Standard_True; // 透過影を有効化
+
     // シンプルな形状（ボックス）を作成
     TopoDS_Shape box = BRepPrimAPI_MakeBox(100.0, 50.0, 30.0).Shape();
     Handle(AIS_Shape) aisBox = new AIS_Shape(box);
+    
+    // 表示属性を設定
+    Handle(Prs3d_ShadingAspect) shadingAspect = new Prs3d_ShadingAspect();
+    shadingAspect->SetTransparency(0.5); // 透過率（0.0 = 不透明、1.0 = 完全透明）
+    shadingAspect->SetColor(Quantity_NOC_BLUE1); // ボックスの色
+    aisBox->Attributes()->SetShadingAspect(shadingAspect);
+
+    // 表面とエッジを表示
+    context->SetDisplayMode(aisBox, AIS_Shaded, Standard_False); // 表面を表示
+    context->SetDisplayMode(aisBox, AIS_WireFrame, Standard_True); // エッジを表示
+
+    // ボックスを表示
     context->Display(aisBox, Standard_True);
 
     view->FitAll();
