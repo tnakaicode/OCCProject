@@ -35,9 +35,14 @@ ViewerWidget::ViewerWidget(QWidget* parent)
 
 ViewerWidget::~ViewerWidget() {}
 
-void ViewerWidget::displayShape(const TopoDS_Shape& shape) {
+void ViewerWidget::displayShape(const TopoDS_Shape& shape, double transparency) {
     Handle(AIS_Shape) aisShape = new AIS_Shape(shape);
+
+    // 透過度を設定 (0.0 = 不透明, 1.0 = 完全に透明)
+    aisShape->SetTransparency(transparency);
+    m_context->SetDisplayMode(aisShape, AIS_Shaded, Standard_True); // シェーディングモードで表示
     m_context->Display(aisShape, Standard_True);
+
     m_view->FitAll();
 }
 

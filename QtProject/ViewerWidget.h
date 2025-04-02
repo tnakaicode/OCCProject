@@ -18,7 +18,7 @@ public:
     ~ViewerWidget();
 
     // ボックスや他の形状を表示するためのメソッド
-    void displayShape(const TopoDS_Shape& shape);
+    void displayShape(const TopoDS_Shape& shape, double transparency = 0.0);
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -29,10 +29,9 @@ protected:
 
 private:
     Handle(V3d_Viewer) m_viewer;
-    Handle(V3d_View) m_view;
-    Handle(AIS_InteractiveContext) m_context;
-
-    QPoint m_lastMousePos;
+    Handle(V3d_View) m_view; // OpenCASCADE のビュー
+    Handle(AIS_InteractiveContext) m_context; // OpenCASCADE の描画コンテキスト
+    QPoint m_lastMousePos; // マウスの最後の位置
 };
 
 #endif // VIEWERWIDGET_H
