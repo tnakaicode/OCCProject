@@ -2,11 +2,9 @@
 #include <Aspect_DisplayConnection.hxx>
 #include <OpenGl_GraphicDriver.hxx>
 #include <WNT_Window.hxx>
-#include <BRepPrimAPI_MakeBox.hxx>
 #include <AIS_Shape.hxx>
 #include <QResizeEvent>
 #include <QPaintEvent>
-#include <QPainter>
 #include <QMouseEvent>
 #include <QWheelEvent>
 
@@ -16,11 +14,12 @@ ViewerWidget::ViewerWidget(QWidget* parent)
     Handle(Aspect_DisplayConnection) displayConnection = new Aspect_DisplayConnection();
     Handle(OpenGl_GraphicDriver) graphicDriver = new OpenGl_GraphicDriver(displayConnection);
 
-    m_viewer = new V3d_Viewer(graphicDriver);
-    m_viewer->SetDefaultLights();
-    m_viewer->SetLightOn();
+    // ビューアとビューの作成
+    Handle(V3d_Viewer) viewer = new V3d_Viewer(graphicDriver);
+    viewer->SetDefaultLights();
+    viewer->SetLightOn();
 
-    m_view = m_viewer->CreateView();
+    m_view = viewer->CreateView();
     Handle(WNT_Window) wntWindow = new WNT_Window((Aspect_Handle)winId());
     m_view->SetWindow(wntWindow);
 
@@ -28,17 +27,19 @@ ViewerWidget::ViewerWidget(QWidget* parent)
         wntWindow->Map();
     }
 
-    m_context = new AIS_InteractiveContext(m_viewer);
-
-    // シンプルな形状（ボックス）を作成
-    TopoDS_Shape box = BRepPrimAPI_MakeBox(100.0, 50.0, 30.0).Shape();
-    Handle(AIS_Shape) aisBox = new AIS_Shape(box);
-    m_context->Display(aisBox, Standard_True);
+    // 描画コンテキストの作成
+    m_context = new AIS_InteractiveContext(viewer);
 
     m_view->FitAll();
 }
 
 ViewerWidget::~ViewerWidget() {}
+
+void ViewerWidget::displayShape(const TopoDS_Shape& shape) {
+    Handle(AIS_Shape) aisShape = new AIS_Shape(shape);
+    m_context->Display(aisShape, Standard_True);
+    m_view->FitAll();
+}
 
 void ViewerWidget::paintEvent(QPaintEvent* event) {
     if (!m_view.IsNull()) {

@@ -8,6 +8,7 @@
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Shape.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
+#include <TopoDS_Shape.hxx>
 
 class ViewerWidget : public QWidget {
     Q_OBJECT
@@ -15,6 +16,9 @@ class ViewerWidget : public QWidget {
 public:
     explicit ViewerWidget(QWidget* parent = nullptr);
     ~ViewerWidget();
+
+    // ボックスや他の形状を表示するためのメソッド
+    void displayShape(const TopoDS_Shape& shape);
 
 protected:
     void paintEvent(QPaintEvent* event) override;
