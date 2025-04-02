@@ -29,7 +29,20 @@
                 "kind": "build",
                 "isDefault": false
             },
+            "dependsOn": ["build-qt-clean"], // ビルド前にクリーンを実行
             "problemMatcher": ["$msCompile"]
+        },
+        {
+            "label": "build-qt-clean",
+            "type": "shell",
+            "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "${workspaceFolder}/QtProject/QtProject.vcxproj",
+                "/t:Clean", // Clean タスクを実行
+                "/property:Configuration=Debug",
+                "/property:Platform=x64"
+            ],
+            "problemMatcher": []
         },
         {
             "label": "build-opencascade-viewer",
