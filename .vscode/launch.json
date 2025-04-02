@@ -29,10 +29,42 @@
       "environment": [
         {
           "name": "PATH",
-          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\bin;C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\plugins\\platforms;%PATH%"
+          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\win64\\vc14\\bin;C:\\OpenCASCADE-7.5.0-vc14-64\\openvr-1.14.15-64\\bin\\win64;C:\\OpenCASCADE-7.5.0-vc14-64\\ffmpeg-3.3.4-64\\bin;C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\bin;C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\plugins\\platforms;C:\\OpenCASCADE-7.7.0-vc14-64\\tbb_2021.5-vc14-64\\bin;%PATH%"
+        },
+        {
+          "name": "CSF_GraphicShr",
+          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\win64\\vc14\\bin\\TKOpenGl.dll"
+        },
+        {
+          "name": "CSF_UnitsLexicon",
+          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\src\\UnitsAPI\\Lexi_Expr.dat"
+        },
+        {
+          "name": "CSF_UnitsDefinition",
+          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\src\\UnitsAPI\\Units.dat"
+        },
+        {
+          "name": "CSF_SHMessage",
+          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\src\\SHMessage"
+        },
+        {
+          "name": "CSF_XSMessage",
+          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\src\\XSMessage"
+        },
+        {
+          "name": "CSF_TObjMessage",
+          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\src\\TObjMessage"
+        },
+        {
+          "name": "QT_QPA_PLATFORM_PLUGIN_PATH",
+          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\plugins\\platforms"
+        },
+        {
+          "name": "QT_PLUGIN_PATH",
+          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\plugins"
         }
       ],
-      "console": "externalTerminal",
+      "console": "integratedTerminal",
       "preLaunchTask": "build-qt"
     },
     {

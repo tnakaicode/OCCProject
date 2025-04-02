@@ -31,8 +31,8 @@
 'QtProject.exe' (Win32): Loaded 'C:\Windows\System32\vcruntime140d.dll'. 
 'QtProject.exe' (Win32): Loaded 'C:\Windows\System32\vcruntime140_1d.dll'. 
 'QtProject.exe' (Win32): Loaded 'C:\Windows\System32\ucrtbased.dll'. 
-'QtProject.exe' (Win32): Loaded 'C:\Users\Nakai\anaconda3\Library\bin\tbb12.dll'. 
-'QtProject.exe' (Win32): Loaded 'C:\OpenCASCADE-7.5.0-vc14-64\tbb_2017.0.100\bin\intel64\vc14\tbbmalloc.dll'. Symbols loaded.
+'QtProject.exe' (Win32): Loaded 'C:\OpenCASCADE-7.7.0-vc14-64\tbb_2021.5-vc14-64\bin\tbb12.dll'. Module was built without symbols.
+'QtProject.exe' (Win32): Loaded 'C:\OpenCASCADE-7.7.0-vc14-64\tbb_2021.5-vc14-64\bin\tbbmalloc.dll'. Module was built without symbols.
 'QtProject.exe' (Win32): Loaded 'C:\Windows\System32\wsock32.dll'. 
 'QtProject.exe' (Win32): Loaded 'C:\Windows\System32\msvcp140.dll'. 
 'QtProject.exe' (Win32): Loaded 'C:\Windows\System32\vcruntime140.dll'. 
@@ -92,7 +92,7 @@
 'QtProject.exe' (Win32): Loaded 'C:\Windows\System32\srvcli.dll'. 
 'QtProject.exe' (Win32): Loaded 'C:\Windows\System32\cryptbase.dll'. 
 'QtProject.exe' (Win32): Loaded 'C:\Windows\System32\imm32.dll'. 
-The thread 44880 has exited with code 0 (0x0).
+The thread 13224 has exited with code 0 (0x0).
 'QtProject.exe' (Win32): Loaded 'C:\Windows\System32\bcryptprimitives.dll'. 
 'QtProject.exe' (Win32): Loaded 'C:\Windows\System32\SHCore.dll'. 
 'QtProject.exe' (Win32): Loaded 'C:\Windows\System32\shlwapi.dll'. 
@@ -104,7 +104,5 @@ Unhandled exception at 0x00007FFDE16D286E (ucrtbase.dll) in QtProject.exe: Fatal
 Unhandled exception at 0x00007FFDE16D286E (ucrtbase.dll) in QtProject.exe: Fatal program exit requested.
 
 Unhandled exception at 0x00007FFDE16D286E (ucrtbase.dll) in QtProject.exe: Fatal program exit requested.
-
-The program '[64892] QtProject.exe' has exited with code 0 (0x0).
 
 ```
