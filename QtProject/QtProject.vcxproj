@@ -10,7 +10,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{E3CE3FB0-E402-45D3-90E2-D04A7A46EDAA}</ProjectGuid>
+    <ProjectGuid>{YOUR-PROJECT-GUID}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
     <RootNamespace>QtProject</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -37,31 +38,54 @@
     <LocalDebuggerMergeEnvironment>true</LocalDebuggerMergeEnvironment>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>
-        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include;
-        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtWidgets;
-        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtCore;
-        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtGui;
-        %(AdditionalIncludeDirectories)
-      </AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include;C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>
-        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\lib;
-        %(AdditionalLibraryDirectories)
-      </AdditionalLibraryDirectories>
-      <AdditionalDependencies>
-        Qt5Core.lib;
-        Qt5Gui.lib;
-        Qt5Widgets.lib;
-        %(AdditionalDependencies)
-      </AdditionalDependencies>
+      <AdditionalDependencies>Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;TKernel.lib;TKMath.lib;TKG2d.lib;TKG3d.lib;TKBRep.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKTopAlgo.lib;TKV3d.lib;TKOpenGl.lib;TKService.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\lib;C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include;C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;TKernel.lib;TKMath.lib;TKG2d.lib;TKG3d.lib;TKBRep.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKTopAlgo.lib;TKV3d.lib;TKOpenGl.lib;TKService.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\lib;C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ViewerWidget.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ViewerWidget.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
 </Project>
