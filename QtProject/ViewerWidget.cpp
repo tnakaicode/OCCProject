@@ -17,6 +17,7 @@
 #include <QFile>
 #include <QMessageBox>
 #include <iostream>
+#include <iomanip>
 
 ViewerWidget::ViewerWidget(QWidget *parent)
     : QWidget(parent)
@@ -68,10 +69,74 @@ void ViewerWidget::loadStepFile(const char* filePath)
         return;
     }
 
-    // 形状を表示
-    Handle(AIS_Shape) aisShape = new AIS_Shape(shape);
-    m_context->Display(aisShape, Standard_True);
+    // OCAF ドキュメントを作成
+    Handle(TDocStd_Document) doc = new TDocStd_Document("XmlOcaf");
+    Handle(XCAFDoc_ShapeTool) shapeTool = XCAFDoc_DocumentTool::ShapeTool(doc->Main());
+    Handle(XCAFDoc_ColorTool) colorTool = XCAFDoc_DocumentTool::ColorTool(doc->Main());
+
+    // 形状を OCAF に登録
+    TDF_Label rootLabel = shapeTool->AddShape(shape);
+
+    // ツリー構造を出力
+    std::cout << "STEP File Tree Structure:" << std::endl;
+    printLabelTree(rootLabel, shapeTool, colorTool, 0);
+
+    // 色情報を取得して表示
+    TDF_LabelSequence labels;
+    shapeTool->GetFreeShapes(labels);
+
+    for (Standard_Integer i = 1; i <= labels.Length(); i++)
+    {
+        TDF_Label label = labels.Value(i);
+        TopoDS_Shape subShape = shapeTool->GetShape(label);
+
+        Quantity_Color color;
+        if (colorTool->GetColor(label, XCAFDoc_ColorSurf, color))
+        {
+            Handle(AIS_Shape) aisShape = new AIS_Shape(subShape);
+            aisShape->SetColor(color);
+            m_context->Display(aisShape, Standard_True);
+        }
+        else
+        {
+            Handle(AIS_Shape) aisShape = new AIS_Shape(subShape);
+            m_context->Display(aisShape, Standard_True);
+        }
+    }
+
     m_view->FitAll();
+}
+
+void ViewerWidget::printLabelTree(const TDF_Label& label, const Handle(XCAFDoc_ShapeTool)& shapeTool, const Handle(XCAFDoc_ColorTool)& colorTool, int depth)
+{
+    // インデントを設定
+    std::cout << std::setw(depth * 2) << "" << "- ";
+
+    // ラベルの名前を取得
+    TCollection_AsciiString name;
+    if (label.Tag() != 0) {
+        label.EntryDump(name);
+        std::cout << name.ToCString();
+    } else {
+        std::cout << "(Unnamed)";
+    }
+
+    // 色情報を取得
+    Quantity_Color color;
+    if (colorTool->GetColor(label, XCAFDoc_ColorSurf, color))
+    {
+        std::cout << " [Color: R=" << color.Red() << ", G=" << color.Green() << ", B=" << color.Blue() << "]";
+    }
+
+    std::cout << std::endl;
+
+    // 子ラベルを再帰的に出力
+    TDF_LabelSequence children;
+    label.FindChild(1, children);
+    for (Standard_Integer i = 1; i <= children.Length(); i++)
+    {
+        printLabelTree(children.Value(i), shapeTool, colorTool, depth + 1);
+    }
 }
 
 void ViewerWidget::displayShape(const TopoDS_Shape &shape, double transparency, const Quantity_Color *faceColor, const Quantity_Color *edgeColor)

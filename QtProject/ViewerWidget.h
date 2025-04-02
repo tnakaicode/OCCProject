@@ -10,6 +10,13 @@
 #include <BRepPrimAPI_MakeBox.hxx>
 #include <TopoDS_Shape.hxx>
 #include <Quantity_Color.hxx>
+#include <STEPControl_Reader.hxx>
+#include <TDocStd_Document.hxx>
+#include <XCAFDoc_DocumentTool.hxx>
+#include <XCAFDoc_ShapeTool.hxx>
+#include <XCAFDoc_ColorTool.hxx>
+#include <TDF_LabelSequence.hxx>
+#include <TDF_Label.hxx>
 
 class ViewerWidget : public QWidget
 {
@@ -25,6 +32,9 @@ public:
     // STEP ファイルを読み込んで表示するメソッド
     void loadStepFile(const char* filePath);
 
+private:
+    // ツリー構造を出力するヘルパー関数
+    void printLabelTree(const TDF_Label& label, const Handle(XCAFDoc_ShapeTool)& shapeTool, const Handle(XCAFDoc_ColorTool)& colorTool, int depth);
 protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
