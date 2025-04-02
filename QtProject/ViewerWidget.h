@@ -35,7 +35,11 @@ public:
 private:
     // ツリー構造を出力するヘルパー関数
     void printLabelTree(const TDF_Label& label, const Handle(XCAFDoc_ShapeTool)& shapeTool, const Handle(XCAFDoc_ColorTool)& colorTool, int depth);
-protected:
+
+    // ラベルに関連付けられた形状を表示するヘルパー関数
+    void displayShapeWithColors(const TDF_Label& label, const Handle(XCAFDoc_ShapeTool)& shapeTool, const Handle(XCAFDoc_ColorTool)& colorTool);
+
+    protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
