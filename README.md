@@ -808,6 +808,217 @@ Visual Studio のプロジェクトファイルを直接編集せずに、コマ
 
 ---
 
+## Handleのメモリ管理
+
+`Handle(XCAFDoc_ShapeTool) shapeTool = XCAFDoc_DocumentTool::ShapeTool(doc->Main());` のコードでは、`shapeTool` は **`new` 宣言されていません**。このコードは、`XCAFDoc_DocumentTool::ShapeTool` メソッドを呼び出して、既存の `XCAFDoc_ShapeTool` オブジェクトを取得しているだけです。
+
+---
+
+### **詳細な説明**
+
+#### **1. `XCAFDoc_DocumentTool::ShapeTool` の動作**
+
+- `XCAFDoc_DocumentTool::ShapeTool` は、`doc->Main()`（OCAF ドキュメントのルートラベル）から `XCAFDoc_ShapeTool` を取得するための静的メソッドです。
+- このメソッドは、OCAF ドキュメント内に既に存在する `XCAFDoc_ShapeTool` を検索し、`Handle` を返します。
+- 必要に応じて、`XCAFDoc_ShapeTool` がまだ存在しない場合は、新しいインスタンスを作成してドキュメントに登録する可能性があります（内部で `new` を使用している場合があります）。
+
+---
+
+#### **2. `Handle` の役割**
+
+- `Handle` はスマートポインタであり、`XCAFDoc_ShapeTool` のような `Standard_Transient` を継承したクラスのインスタンスを管理します。
+- `XCAFDoc_DocumentTool::ShapeTool` メソッドは、`Handle(XCAFDoc_ShapeTool)` を返すため、`shapeTool` はそのオブジェクトを共有する形になります。
+
+---
+
+#### **3. `new` の有無について**
+
+- **コード内で `new` を明示的に呼び出していない**ため、`shapeTool` 自体は新しいオブジェクトを作成していません。
+- ただし、`XCAFDoc_DocumentTool::ShapeTool` の内部で、必要に応じて `new` を使用して `XCAFDoc_ShapeTool` を作成している可能性があります。
+
+---
+
+### **コードの流れを簡単に説明**
+
+以下のコードを例に、`shapeTool` がどのように取得されるかを説明します。
+
+```cpp
+// OCAF ドキュメントを作成
+Handle(TDocStd_Document) doc = new TDocStd_Document("XmlOcaf");
+
+// ShapeTool と ColorTool を取得
+Handle(XCAFDoc_ShapeTool) shapeTool = XCAFDoc_DocumentTool::ShapeTool(doc->Main());
+Handle(XCAFDoc_ColorTool) colorTool = XCAFDoc_DocumentTool::ColorTool(doc->Main());
+```
+
+1. **`doc->Main()`**
+   - OCAF ドキュメントのルートラベル（`TDF_Label`）を取得します。
+   - このラベルは、OCAF ドキュメント内のすべてのデータ構造のエントリポイントです。
+
+2. **`XCAFDoc_DocumentTool::ShapeTool(doc->Main())`**
+   - `doc->Main()` を引数として渡し、`XCAFDoc_ShapeTool` を取得します。
+   - このメソッドは、ルートラベルに関連付けられた `XCAFDoc_ShapeTool` を検索します。
+   - もし `XCAFDoc_ShapeTool` がまだ存在しない場合、内部で `new` を使用して新しいインスタンスを作成し、ルートラベルに登録します。
+
+3. **`Handle` の役割**
+   - `Handle(XCAFDoc_ShapeTool)` は、`XCAFDoc_ShapeTool` オブジェクトを参照するスマートポインタです。
+   - 参照カウントを管理し、オブジェクトのライフサイクルを制御します。
+
+---
+
+### **`XCAFDoc_DocumentTool::ShapeTool` の内部動作（推測）**
+
+`XCAFDoc_DocumentTool::ShapeTool` の内部は、以下のような動作をしていると考えられます。
+
+```cpp
+Handle(XCAFDoc_ShapeTool) XCAFDoc_DocumentTool::ShapeTool(const TDF_Label& label) {
+    // ラベルに関連付けられた ShapeTool を検索
+    Handle(XCAFDoc_ShapeTool) shapeTool;
+    if (!label.FindAttribute(XCAFDoc_ShapeTool::GetID(), shapeTool)) {
+        // ShapeTool が存在しない場合、新しいインスタンスを作成
+        shapeTool = new XCAFDoc_ShapeTool();
+        label.AddAttribute(shapeTool); // ラベルに登録
+    }
+    return shapeTool;
+}
+```
+
+- **`label.FindAttribute`**
+  - ラベルに関連付けられた `XCAFDoc_ShapeTool` を検索します。
+  - 見つかった場合は、それを `Handle` に格納して返します。
+
+- **`new XCAFDoc_ShapeTool()`**
+  - `XCAFDoc_ShapeTool` が見つからない場合、新しいインスタンスを作成します。
+
+- **`label.AddAttribute`**
+  - 作成した `XCAFDoc_ShapeTool` をラベルに登録します。
+
+---
+
+### **4. まとめ**
+
+- **`shapeTool` はメソッド内で `new` 宣言されているか？**
+  - **直接的にはされていません**。
+  - ただし、`XCAFDoc_DocumentTool::ShapeTool` の内部で、必要に応じて `new` を使用して `XCAFDoc_ShapeTool` を作成している可能性があります。
+
+- **`Handle` の役割**
+  - `Handle` は、`XCAFDoc_ShapeTool` のようなオブジェクトを参照し、参照カウントを管理します。
+  - `Handle` を通じて、OCAF ドキュメント内のデータ構造を安全に操作できます。
+
+- **`XCAFDoc_DocumentTool::ShapeTool` の動作**
+  - 既存の `XCAFDoc_ShapeTool` を検索し、見つからない場合は新しいインスタンスを作成して返します。
+
+この仕組みにより、OCAF ドキュメント内のデータ構造が効率的に管理されます。
+
+## 例
+
+以下は、`doc` と `shapeTool` がそれぞれどのメモリ上に存在するかについての説明です。
+
+---
+
+### **1. `doc` のメモリ上の配置**
+
+```cpp
+Handle(TDocStd_Document) doc = new TDocStd_Document("XmlOcaf");
+```
+
+#### **`doc` の構造**
+
+- **`doc` 自体**:
+  - `doc` は `Handle(TDocStd_Document)` 型のスマートポインタです。
+  - このスマートポインタは、通常の C++ オブジェクトとして **スタックメモリ** 上に存在します（このコードではローカル変数として宣言されているため）。
+- **`doc` が管理するオブジェクト**:
+  - `new TDocStd_Document("XmlOcaf")` によって、`TDocStd_Document` のインスタンスが **ヒープメモリ** 上に動的に割り当てられます。
+  - `doc` は、このヒープメモリ上のオブジェクトを参照し、参照カウントを管理します。
+
+#### **メモリの流れ**
+
+1. **スタックメモリ**:
+   - `Handle(TDocStd_Document) doc` はスタック上に存在します。
+2. **ヒープメモリ**:
+   - `TDocStd_Document` のインスタンスはヒープメモリ上に動的に割り当てられます。
+
+---
+
+### **2. `shapeTool` のメモリ上の配置**
+
+```cpp
+Handle(XCAFDoc_ShapeTool) shapeTool = XCAFDoc_DocumentTool::ShapeTool(doc->Main());
+```
+
+#### **`shapeTool` の構造**
+
+- **`shapeTool` 自体**:
+  - `shapeTool` は `Handle(XCAFDoc_ShapeTool)` 型のスマートポインタです。
+  - このスマートポインタは、通常の C++ オブジェクトとして **スタックメモリ** 上に存在します（このコードではローカル変数として宣言されているため）。
+- **`shapeTool` が管理するオブジェクト**:
+  - `XCAFDoc_DocumentTool::ShapeTool(doc->Main())` によって取得される `XCAFDoc_ShapeTool` のインスタンスは、**ヒープメモリ** 上に存在します。
+  - このインスタンスは、OCAF ドキュメント（`doc`）のルートラベル（`doc->Main()`）に関連付けられています。
+
+#### **メモリの流れ**
+
+1. **スタックメモリ**:
+   - `Handle(XCAFDoc_ShapeTool) shapeTool` はスタック上に存在します。
+2. **ヒープメモリ**:
+   - `XCAFDoc_ShapeTool` のインスタンスは、OCAF ドキュメント内でヒープメモリ上に動的に割り当てられます。
+
+---
+
+### **3. `doc` と `shapeTool` の関係**
+
+- **`doc` の役割**:
+  - `doc` は OCAF ドキュメント全体を管理するスマートポインタです。
+  - `doc->Main()` を通じて、OCAF ドキュメント内のルートラベル（`TDF_Label`）にアクセスします。
+
+- **`shapeTool` の役割**:
+  - `shapeTool` は、OCAF ドキュメント内の形状データ（`XCAFDoc_ShapeTool`）を管理するスマートポインタです。
+  - `XCAFDoc_DocumentTool::ShapeTool(doc->Main())` を呼び出すことで、OCAF ドキュメントのルートラベルに関連付けられた `XCAFDoc_ShapeTool` を取得します。
+
+---
+
+### **4. メモリの配置を図で表す**
+
+以下は、`doc` と `shapeTool` のメモリ配置を図で表したものです。
+
+```cmd
+スタックメモリ:
++---------------------------+
+| Handle(TDocStd_Document)  | --> ヒープメモリ上の TDocStd_Document
+| Handle(XCAFDoc_ShapeTool) | --> ヒープメモリ上の XCAFDoc_ShapeTool
++---------------------------+
+
+ヒープメモリ:
++---------------------------+
+| TDocStd_Document          | --> OCAF ドキュメント全体を管理
+| XCAFDoc_ShapeTool         | --> OCAF ドキュメント内の形状データを管理
++---------------------------+
+```
+
+---
+
+### **5. まとめ**
+
+| **変数**       | **メモリの種類**       | **説明**                                                                 |
+|----------------|-----------------------|--------------------------------------------------------------------------|
+| `doc`          | スタックメモリ         | `Handle(TDocStd_Document)` 型のスマートポインタ。スタック上に存在。       |
+| `doc` が管理するオブジェクト | ヒープメモリ         | `TDocStd_Document` のインスタンス。ヒープメモリ上に動的に割り当てられる。 |
+| `shapeTool`    | スタックメモリ         | `Handle(XCAFDoc_ShapeTool)` 型のスマートポインタ。スタック上に存在。       |
+| `shapeTool` が管理するオブジェクト | ヒープメモリ         | `XCAFDoc_ShapeTool` のインスタンス。ヒープメモリ上に動的に割り当てられる。 |
+
+---
+
+### **補足**
+
+- **`Handle` の役割**:
+  - `Handle` は、ヒープメモリ上のオブジェクトを安全に管理するためのスマートポインタです。
+  - 参照カウントを使用して、オブジェクトのライフサイクルを自動的に制御します。
+
+- **OCAF ドキュメントの構造**:
+  - OCAF ドキュメントは、ツリー構造を持つラベル（`TDF_Label`）を通じてデータを管理します。
+  - `XCAFDoc_ShapeTool` は、このツリー構造の一部として管理されます。
+
+これで、`doc` と `shapeTool` がどのメモリ上に存在するかが明確になりました！ 😊
+
 ## **デバッグ情報**
 
 以下は、アプリケーション実行時のデバッグログの一部です。
