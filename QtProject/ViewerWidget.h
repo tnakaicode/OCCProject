@@ -39,6 +39,12 @@ private:
     // ラベルに関連付けられた形状を表示するヘルパー関数
     void displayShapeWithColors(const TDF_Label& label, const Handle(XCAFDoc_ShapeTool)& shapeTool, const Handle(XCAFDoc_ColorTool)& colorTool);
 
+    // ラベルに関連付けられた形状を適切な Location を適用して表示するヘルパー関数
+    void displayShapeWithLocation(const TDF_Label& label, const Handle(XCAFDoc_ShapeTool)& shapeTool, const Handle(XCAFDoc_ColorTool)& colorTool, const TopLoc_Location& parentLocation);
+
+    // Location 情報を出力するヘルパー関数
+    void printLocation(const TopLoc_Location& location);
+
     protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
