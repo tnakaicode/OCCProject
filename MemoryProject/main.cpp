@@ -3,25 +3,69 @@
 #include <iostream>
 #include <memory>
 
-class MyClass : public Standard_Transient {
+class MyClass : public Standard_Transient
+{
 public:
     MyClass() { std::cout << "MyClass created" << std::endl; }
     ~MyClass() { std::cout << "MyClass destroyed" << std::endl; }
 };
 
-class Node {
-    public:
-        std::shared_ptr<Node> next; // 次のノードを共有
-        std::weak_ptr<Node> prev;   // 前のノードを弱参照（循環参照を防ぐ）
-    
-        ~Node() { std::cout << "Node destroyed" << std::endl; }
-    };
+class Node
+{
+public:
+    std::shared_ptr<Node> next; // 次のノードを共有
+    std::weak_ptr<Node> prev;   // 前のノードを弱参照（循環参照を防ぐ）
 
-int main() {
+    ~Node() { std::cout << "Node destroyed" << std::endl; }
+};
+
+class Child; // 前方宣言
+
+class Parent : public Standard_Transient
+{
+public:
+    Handle(Child) child; // 子を参照
+
+    Parent()
+    {
+        std::cout << "Parent created" << std::endl;
+    }
+
+    ~Parent()
+    {
+        std::cout << "Parent destroyed" << std::endl;
+    }
+};
+
+class Child : public Standard_Transient
+{
+public:
+    Parent *parent; // 親を生ポインタで参照（循環参照を防ぐ）
+
+    Child() : parent(nullptr)
+    {
+        std::cout << "Child created" << std::endl;
+    }
+
+    ~Child()
+    {
+        std::cout << "Child destroyed" << std::endl;
+    }
+};
+
+int main()
+{
     Handle(MyClass) handle1 = new MyClass(); // ヒープ上にオブジェクトを作成
     {
         Handle(MyClass) handle2 = handle1; // 所有権を共有
         std::cout << "Reference count: " << handle1->GetRefCount() << std::endl;
+
+        Handle(Parent) parent = new Parent();
+        Handle(Child) child = new Child();
+
+        parent->child = child;        // 親が子を参照
+        child->parent = parent.get(); // 子が親を生ポインタで参照
+
     } // handle2 がスコープを抜ける → 参照カウントが減少
     std::cout << "Reference count: " << handle1->GetRefCount() << std::endl;
 
@@ -30,6 +74,8 @@ int main() {
 
     node1->next = node2; // node1 が node2 を共有
     node2->prev = node1; // node2 が node1 を弱参照
+
+    std::cout << "End of main" << std::endl;
 
     return 0; // handle1 がスコープを抜ける → オブジェクトが解放される
 }
