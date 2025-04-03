@@ -11,6 +11,7 @@
 #include <XCAFDoc_ColorTool.hxx>
 #include <TDF_LabelSequence.hxx>
 #include <TDF_Label.hxx>
+#include <TDataStd_Name.hxx>
 #include <QResizeEvent>
 #include <QPaintEvent>
 #include <QMouseEvent>
@@ -106,35 +107,56 @@ void ViewerWidget::loadStepFile(const char *filePath)
     for (Standard_Integer i = 1; i <= allShapes.Length(); i++)
     {
         TDF_Label rootLabel = allShapes.Value(i);
-        displayShapeWithLocation(rootLabel, shapeTool, colorTool, TopLoc_Location());
+        displayShapeWithLocation(rootLabel, shapeTool, colorTool, TopLoc_Location(), 0);
     }
 
     m_view->FitAll();
 }
 
-void ViewerWidget::displayShapeWithLocation(const TDF_Label &label, const Handle(XCAFDoc_ShapeTool) & shapeTool, const Handle(XCAFDoc_ColorTool) & colorTool, const TopLoc_Location &parentLocation)
+void ViewerWidget::displayShapeWithLocation(const TDF_Label &label, const Handle(XCAFDoc_ShapeTool) & shapeTool, const Handle(XCAFDoc_ColorTool) & colorTool, const TopLoc_Location &parentLocation, int depth)
 {
-    //std::cout << shapeTool->IsAssembly(label) << std::endl;
-    //std::cout << shapeTool->IsShape(label) << std::endl;
-    //std::cout << shapeTool->IsSimpleShape(label) << std::endl;
-
     // ラベルに関連付けられた形状を取得
     if (shapeTool->IsShape(label))
     {
         TopoDS_Shape shape = shapeTool->GetShape(label);
         if (!shape.IsNull())
         {
+            if (label.IsAttribute(TDataStd_Name::GetID()))
+            {
+                Handle(TDataStd_Name) nameAttribute;
+                if (label.FindAttribute(TDataStd_Name::GetID(), nameAttribute))
+                {
+                    TCollection_ExtendedString name = nameAttribute->Get();
+                    std::wcout << name.ToWideString() << std::endl; // ラベルの名前を出力
+                }
+            }
+
+            // インデントを設定してツリー構造を表示
+            std::cout << std::setw(depth * 2) << "" << "- ";
+            // ラベルの名前を取得して出力
+
+            // ラベルのエントリ情報を取得して表示 (例: 0:1:1)
+            std::ostringstream entryStream;
+            label.EntryDump(entryStream);   // EntryDump に std::ostringstream を渡す
+            std::cout << entryStream.str(); // ストリームの内容を文字列として出力
+            // TCollection_AsciiString entry;
+            // label.EntryDump(entry);
+            // std::cout << entry.ToCString() << " ";
+
             // ラベルのローカル Location を取得
-            TopLoc_Location localLocation = shapeTool->GetLocation(label);
-            //printLocation(localLocation);
+            //TopLoc_Location localLocation = shapeTool->GetLocation(label);
+            TopLoc_Location localLocation = shape.Location();
 
             // 親の Location を適用
             TopLoc_Location combinedLocation = parentLocation * localLocation;
-            //printLocation(combinedLocation);
+
+            // Location 情報を出力
+            std::cout << " (Location: ";
+            printLocation(localLocation);
+            std::cout << ")" << std::endl;
 
             // 形状に Location を適用
             TopoDS_Shape transformedShape = shape.Moved(combinedLocation);
-
 
             // 色を取得
             Quantity_Color color;
@@ -158,16 +180,15 @@ void ViewerWidget::displayShapeWithLocation(const TDF_Label &label, const Handle
     shapeTool->GetSubShapes(label, children);
     for (Standard_Integer i = 1; i <= children.Length(); i++)
     {
-        displayShapeWithLocation(children.Value(i), shapeTool, colorTool, parentLocation);
+        displayShapeWithLocation(children.Value(i), shapeTool, colorTool, parentLocation, depth + 1);
     }
 }
 
-
-void ViewerWidget::printLocation(const TopLoc_Location& location)
+void ViewerWidget::printLocation(const TopLoc_Location &location)
 {
     //if (location.IsIdentity())
     //{
-    //    std::cout << "  Identity (no transformation)" << std::endl;
+    //    std::cout << "Identity";
     //    return;
     //}
 
@@ -184,16 +205,16 @@ void ViewerWidget::printLocation(const TopLoc_Location& location)
     Standard_Real scale = transformation.ScaleFactor();
 
     // 平行移動を出力
-    std::cout << "  Translation: (" << translation.X() << ", " << translation.Y() << ", " << translation.Z() << ")" << std::endl;
+    std::cout << "Translation=(" << translation.X() << ", " << translation.Y() << ", " << translation.Z() << "), ";
 
     // 回転行列を出力
-    std::cout << "  Rotation Matrix:" << std::endl;
-    std::cout << "    [" << rotation.Value(1, 1) << ", " << rotation.Value(1, 2) << ", " << rotation.Value(1, 3) << "]" << std::endl;
-    std::cout << "    [" << rotation.Value(2, 1) << ", " << rotation.Value(2, 2) << ", " << rotation.Value(2, 3) << "]" << std::endl;
-    std::cout << "    [" << rotation.Value(3, 1) << ", " << rotation.Value(3, 2) << ", " << rotation.Value(3, 3) << "]" << std::endl;
+    std::cout << "RotationMatrix=["
+              << rotation.Value(1, 1) << ", " << rotation.Value(1, 2) << ", " << rotation.Value(1, 3) << "; "
+              << rotation.Value(2, 1) << ", " << rotation.Value(2, 2) << ", " << rotation.Value(2, 3) << "; "
+              << rotation.Value(3, 1) << ", " << rotation.Value(3, 2) << ", " << rotation.Value(3, 3) << "], ";
 
     // スケールを出力
-    std::cout << "  Scale: " << scale << std::endl;
+    std::cout << "Scale=" << scale;
 }
 
 void ViewerWidget::displayShapeWithColors(const TDF_Label &label, const Handle(XCAFDoc_ShapeTool) & shapeTool, const Handle(XCAFDoc_ColorTool) & colorTool)
