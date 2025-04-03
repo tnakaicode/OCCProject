@@ -40,9 +40,10 @@ public:
 class Child : public Standard_Transient
 {
 public:
-    Parent *parent; // 親を生ポインタで参照（循環参照を防ぐ）
+    // Parent *parent; // 親を生ポインタで参照（循環参照を防ぐ）
+    Handle(Parent) parent; // 親を参照
 
-    Child() : parent(nullptr)
+    Child()
     {
         std::cout << "Child created" << std::endl;
     }
@@ -55,25 +56,27 @@ public:
 
 int main()
 {
-    Handle(MyClass) handle1 = new MyClass(); // ヒープ上にオブジェクトを作成
+    // Handle(MyClass) handle1 = new MyClass(); // ヒープ上にオブジェクトを作成
     {
-        Handle(MyClass) handle2 = handle1; // 所有権を共有
-        std::cout << "Reference count: " << handle1->GetRefCount() << std::endl;
+        // Handle(MyClass) handle2 = handle1; // 所有権を共有
+        // std::cout << "Reference count: " << handle1->GetRefCount() << std::endl;
 
         Handle(Parent) parent = new Parent();
         Handle(Child) child = new Child();
 
-        parent->child = child;        // 親が子を参照
-        child->parent = parent.get(); // 子が親を生ポインタで参照
+        parent->child = child; // 親が子を参照
+        // child->parent = parent.get(); // 子が親を生ポインタで参照
+        child->parent = parent; // 子が親を参照（循環参照が発生する箇所）
+        std::cout << "Reference count of child: " << child->GetRefCount() << std::endl;
 
     } // handle2 がスコープを抜ける → 参照カウントが減少
-    std::cout << "Reference count: " << handle1->GetRefCount() << std::endl;
+    // std::cout << "Reference count: " << handle1->GetRefCount() << std::endl;
 
-    std::shared_ptr<Node> node1 = std::make_shared<Node>();
-    std::shared_ptr<Node> node2 = std::make_shared<Node>();
+    // std::shared_ptr<Node> node1 = std::make_shared<Node>();
+    // std::shared_ptr<Node> node2 = std::make_shared<Node>();
 
-    node1->next = node2; // node1 が node2 を共有
-    node2->prev = node1; // node2 が node1 を弱参照
+    // node1->next = node2; // node1 が node2 を共有
+    // node2->prev = node1; // node2 が node1 を弱参照
 
     std::cout << "End of main" << std::endl;
 
