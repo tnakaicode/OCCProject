@@ -1,6 +1,4 @@
 .vs/*
-x64/Debug/*
-*/x64/Debug/*
 
 #.vscode/c_cpp_properties.json
 .vscode/settings.json
