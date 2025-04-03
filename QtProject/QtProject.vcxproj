@@ -113,6 +113,8 @@
       <SubSystem>Console</SubSystem>
       <LinkStatus>true</LinkStatus>
       <PreventDllBinding>true</PreventDllBinding>
+      <HeapReserveSize>18874368</HeapReserveSize>
+      <StackReserveSize>18874368</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
