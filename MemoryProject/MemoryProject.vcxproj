@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{12345678-ABCD-1234-ABCD-1234567890AB}</ProjectGuid>
+    <ProjectGuid>{D4E6A1B3-1234-5678-ABCD-1234567890AB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>MemoryProject</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
@@ -59,6 +59,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>TKernel.lib;TKMath.lib;TKBRep.lib;Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\lib;C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
