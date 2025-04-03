@@ -1,7 +1,10 @@
+#define _CRTDBG_MAP_ALLOC
 #include <Standard_Handle.hxx>
 #include <Standard_Transient.hxx>
 #include <iostream>
 #include <memory>
+#include <cstdlib>
+#include <crtdbg.h>
 
 class MyClass : public Standard_Transient
 {
@@ -56,7 +59,9 @@ public:
 
 int main()
 {
-    // Handle(MyClass) handle1 = new MyClass(); // ヒープ上にオブジェクトを作成
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    // int* leak = new int[10]; // 解放されないメモリ
+    //  Handle(MyClass) handle1 = new MyClass(); // ヒープ上にオブジェクトを作成
     {
         // Handle(MyClass) handle2 = handle1; // 所有権を共有
         // std::cout << "Reference count: " << handle1->GetRefCount() << std::endl;
@@ -66,6 +71,7 @@ int main()
 
         parent->child = child; // 親が子を参照
         // child->parent = parent.get(); // 子が親を生ポインタで参照
+        child->parent = parent; // 子が親を参照（循環参照が発生する箇所）
         child->parent = parent; // 子が親を参照（循環参照が発生する箇所）
         std::cout << "Reference count of child: " << child->GetRefCount() << std::endl;
 
