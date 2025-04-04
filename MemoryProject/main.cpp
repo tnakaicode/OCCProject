@@ -62,6 +62,35 @@ public:
     }
 };
 
+// TrackedHandle クラスの定義
+template <typename T>
+class TrackedHandle : public Handle(T)
+{
+private:
+    static thread_local void *currentHandle; // スレッドローカルで現在の Handle を追跡
+
+public:
+    // コンストラクタ
+    TrackedHandle(T * ptr) : Handle(T)(ptr) {}
+
+    // 操作中の Handle を設定
+    T *operator->()
+    {
+        currentHandle = this->get();
+        return Handle(T)::operator->();
+    }
+
+    // 現在の Handle を取得
+    static void *getCurrentHandle()
+    {
+        return currentHandle;
+    }
+};
+
+// スレッドローカル変数の初期化
+template <typename T>
+thread_local void *TrackedHandle<T>::currentHandle = nullptr;
+
 class SharedObject : public Standard_Transient
 {
 private:
@@ -129,39 +158,6 @@ private:
     }
 };
 
-// 静的メンバの初期化
-int SharedObject::nextId = 1;
-std::unordered_map<void *, int> SharedObject::handleIds;
-
-// TrackedHandle クラス
-template <typename T>
-class TrackedHandle : public Handle(T)
-{
-private:
-    static thread_local void *currentHandle; // スレッドローカルで現在の Handle を追跡
-
-public:
-    // コンストラクタ
-    TrackedHandle(T * ptr) : Handle(T)(ptr) {}
-
-    // 操作中の Handle を設定
-    T *operator->()
-    {
-        currentHandle = this->get();
-        return Handle(T)::operator->();
-    }
-
-    // 現在の Handle を取得
-    static void *getCurrentHandle()
-    {
-        return currentHandle;
-    }
-};
-
-// スレッドローカル変数の初期化
-template <typename T>
-thread_local void *TrackedHandle<T>::currentHandle = nullptr;
-
 int main()
 {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -209,7 +205,6 @@ int main()
               << ", object3=" << id3 << std::endl;
 
     // object1 を通じて値を変更
-    SharedObject::setCurrentHandle(object1);
     object1->setValue(100);
     object2->setValue(100);
     object2->setValue(200);
