@@ -57,11 +57,29 @@ public:
     }
 };
 
+class SharedObject : public Standard_Transient
+{
+public:
+    int value;
+
+    SharedObject(int val) : value(val) {}
+
+    void setValue(int val)
+    {
+        value = val;
+    }
+
+    int getValue() const
+    {
+        return value;
+    }
+};
+
 int main()
 {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-    int* leak = new int[10]; // 解放されないメモリ
-    //  Handle(MyClass) handle1 = new MyClass(); // ヒープ上にオブジェクトを作成
+    // int* leak = new int[10]; // 解放されないメモリ
+    //   Handle(MyClass) handle1 = new MyClass(); // ヒープ上にオブジェクトを作成
     {
         // Handle(MyClass) handle2 = handle1; // 所有権を共有
         // std::cout << "Reference count: " << handle1->GetRefCount() << std::endl;
@@ -74,6 +92,7 @@ int main()
         child->parent = parent; // 子が親を参照（循環参照が発生する箇所）
         child->parent = parent; // 子が親を参照（循環参照が発生する箇所）
         std::cout << "Reference count of child: " << child->GetRefCount() << std::endl;
+        std::cout << "Reference count of parent: " << parent->GetRefCount() << std::endl;
 
     } // handle2 がスコープを抜ける → 参照カウントが減少
     // std::cout << "Reference count: " << handle1->GetRefCount() << std::endl;
@@ -84,7 +103,24 @@ int main()
     // node1->next = node2; // node1 が node2 を共有
     // node2->prev = node1; // node2 が node1 を弱参照
 
+    // ヒープメモリ上のインスタンスを共有
+    Handle(SharedObject) object1 = new SharedObject(42);
+    Handle(SharedObject) object2 = object1; // object1 と同じインスタンスを共有
+
+    std::cout << "Initial value (object1): " << object1->getValue() << std::endl;
+    std::cout << "Initial value (object2): " << object2->getValue() << std::endl;
+
+    // object1 を通じて値を変更
+    object1->setValue(100);
+
+    // object2 にも変更が反映される
+    std::cout << "Updated value (object1): " << object1->getValue() << std::endl;
+    std::cout << "Updated value (object2): " << object2->getValue() << std::endl;
+
     std::cout << "End of main" << std::endl;
+    _CrtDumpMemoryLeaks(); // メモリリークをチェック
+    // OpenCASCADE のメモリリークチェック
+    Standard::Purge(); // 未解放のオブジェクトを解放
 
     return 0; // handle1 がスコープを抜ける → オブジェクトが解放される
 }
