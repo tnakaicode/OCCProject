@@ -67,29 +67,53 @@ template <typename T>
 class TrackedHandle : public Handle(T)
 {
 private:
-    static thread_local void *currentHandle; // スレッドローカルで現在の Handle を追跡
+    static thread_local TrackedHandle *currentHandle; // スレッドローカルで現在の Handle を追跡
+    int handleId;                                     // 各 Handle に一意の ID を割り当て
+    std::string handleName;                           // 各 Handle に名前を付ける
+    static int nextHandleId;                          // 次に割り当てる Handle ID
 
 public:
     // コンストラクタ
-    TrackedHandle(T * ptr) : Handle(T)(ptr) {}
+    TrackedHandle(T * ptr, const std::string &name)
+        : Handle(T)(ptr), handleId(nextHandleId++), handleName(name) {}
+
+    // コピーコンストラクタ
+    TrackedHandle(const TrackedHandle &other, const std::string &name)
+        : Handle(T)(other), handleId(nextHandleId++), handleName(name) {}
 
     // 操作中の Handle を設定
     T *operator->()
     {
-        currentHandle = this->get();
+        currentHandle = this;
         return Handle(T)::operator->();
     }
 
     // 現在の Handle を取得
-    static void *getCurrentHandle()
+    static TrackedHandle *getCurrentHandle()
     {
         return currentHandle;
+    }
+
+    // Handle ID を取得
+    int getHandleId() const
+    {
+        return handleId;
+    }
+
+    // Handle 名を取得
+    const std::string &getHandleName() const
+    {
+        return handleName;
     }
 };
 
 // スレッドローカル変数の初期化
 template <typename T>
-thread_local void *TrackedHandle<T>::currentHandle = nullptr;
+thread_local TrackedHandle<T> *TrackedHandle<T>::currentHandle = nullptr;
+
+// 次に割り当てる Handle ID の初期化
+template <typename T>
+int TrackedHandle<T>::nextHandleId = 1;
 
 class SharedObject : public Standard_Transient
 {
@@ -132,11 +156,12 @@ public:
     // 変更を通知する
     void notifyChange()
     {
-        int id = getCurrentHandleId();
-        if (id != -1)
+        TrackedHandle<SharedObject> *currentHandle = TrackedHandle<SharedObject>::getCurrentHandle();
+        if (currentHandle)
         {
+            const std::string &handleName = currentHandle->getHandleName();
             std::cout << "SharedObject: Value changed to " << value
-                      << " by Handle ID " << id << std::endl;
+                      << " by Handle " << handleName << std::endl;
         }
         else
         {
@@ -191,9 +216,9 @@ int main()
     // node2->prev = node1; // node2 が node1 を弱参照
 
     // ヒープメモリ上のインスタンスを共有
-    TrackedHandle<SharedObject> object1 = new SharedObject(42);
-    TrackedHandle<SharedObject> object2 = object1; // object1 と同じインスタンスを共有
-    TrackedHandle<SharedObject> object3 = new SharedObject(50);
+    TrackedHandle<SharedObject> object1 = TrackedHandle<SharedObject>(new SharedObject(42), "Object1");
+    TrackedHandle<SharedObject> object2 = TrackedHandle<SharedObject>(object1, "Object2"); // object1 と同じインスタンスを共有
+    TrackedHandle<SharedObject> object3 = TrackedHandle<SharedObject>(new SharedObject(50), "Object3");
 
     std::cout << "Initial value (object1): " << object1->getValue() << std::endl;
     std::cout << "Initial value (object2): " << object2->getValue() << std::endl;
@@ -212,6 +237,7 @@ int main()
     object1->setValue(100);
     object2->setValue(100);
     object2->setValue(200);
+    object3->setValue(200);
 
     std::cout << "End of main" << std::endl;
     _CrtDumpMemoryLeaks(); // メモリリークをチェック
