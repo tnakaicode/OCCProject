@@ -115,16 +115,17 @@ thread_local TrackedHandle<T> *TrackedHandle<T>::currentHandle = nullptr;
 template <typename T>
 int TrackedHandle<T>::nextHandleId = 1;
 
+// SharedObject クラスの定義
 class SharedObject : public Standard_Transient
 {
 private:
-    int value;                                        // 管理する値
-    static int nextId;                                // 次に割り当てるID（静的メンバ）
-    static std::unordered_map<void *, int> handleIds; // HandleごとのIDを管理
+    int value;                 // 管理する値
+    int instanceId;            // 各インスタンスに一意の ID を割り当てる
+    static int nextInstanceId; // 次に割り当てるインスタンス ID
 
 public:
     // コンストラクタ
-    SharedObject(int val) : value(val) {}
+    SharedObject(int val) : value(val), instanceId(nextInstanceId++) {}
 
     // 値を設定し、変更を通知
     void setValue(int val)
@@ -142,15 +143,10 @@ public:
         return value;
     }
 
-    // Handle に一意の ID を割り当てる
-    static int registerHandle(const Handle(SharedObject) & handle)
+    // インスタンス ID を取得
+    int getInstanceId() const
     {
-        void *rawPtr = handle.get();
-        if (handleIds.find(rawPtr) == handleIds.end())
-        {
-            handleIds[rawPtr] = nextId++;
-        }
-        return handleIds[rawPtr];
+        return instanceId;
     }
 
     // 変更を通知する
@@ -161,31 +157,19 @@ public:
         {
             const std::string &handleName = currentHandle->getHandleName();
             std::cout << "SharedObject: Value changed to " << value
-                      << " by Handle " << handleName << std::endl;
+                      << " by Handle " << handleName
+                      << " (Instance ID: " << instanceId << ")" << std::endl;
         }
         else
         {
             std::cout << "SharedObject: Value changed to " << value
-                      << " by an unknown Handle" << std::endl;
+                      << " by an unknown Handle (Instance ID: " << instanceId << ")" << std::endl;
         }
-    }
-
-private:
-    // 現在の Handle ID を取得
-    int getCurrentHandleId() const
-    {
-        void *currentHandle = TrackedHandle<SharedObject>::getCurrentHandle();
-        if (currentHandle && handleIds.find(currentHandle) != handleIds.end())
-        {
-            return handleIds[currentHandle];
-        }
-        return -1; // 未登録の場合
     }
 };
 
 // 静的メンバ変数の定義
-int SharedObject::nextId = 1;
-std::unordered_map<void *, int> SharedObject::handleIds;
+int SharedObject::nextInstanceId = 1;
 
 int main()
 {
@@ -223,15 +207,6 @@ int main()
     std::cout << "Initial value (object1): " << object1->getValue() << std::endl;
     std::cout << "Initial value (object2): " << object2->getValue() << std::endl;
     std::cout << "Initial value (object3): " << object3->getValue() << std::endl;
-
-    // 各 Handle に ID を割り当て
-    int id1 = SharedObject::registerHandle(object1);
-    int id2 = SharedObject::registerHandle(object2);
-    int id3 = SharedObject::registerHandle(object3);
-
-    std::cout << "Handle IDs: object1=" << id1
-              << ", object2=" << id2
-              << ", object3=" << id3 << std::endl;
 
     // object1 を通じて値を変更
     object1->setValue(100);
