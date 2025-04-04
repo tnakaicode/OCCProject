@@ -1,10 +1,19 @@
 #include "calculator.h"
 #include "ui_calculator.h" // 自動生成されたヘッダーファイルをインクルード
 #include <QDebug>          // デバッグ用
+#include <QGridLayout>
 
 Calculator::Calculator(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::Calculator) { // QMainWindow を初期化
-    ui->setupUi(this); // UI を初期化
+    : QWidget(parent), ui(new Ui::Calculator)
+{
+    ui->setupUi(this);
+
+    // 親ウィジェットにレイアウトを適用
+    if (!this->layout())
+    {
+        QGridLayout *layout = new QGridLayout(this);
+        this->setLayout(layout);
+    }
 
     // ボタンのシグナルとスロットを接続
     connect(ui->button0, &QPushButton::clicked, this, &Calculator::onButtonClicked);
@@ -25,20 +34,24 @@ Calculator::Calculator(QWidget *parent)
     connect(ui->buttonClear, &QPushButton::clicked, this, &Calculator::onClearClicked);
 }
 
-Calculator::~Calculator() {
+Calculator::~Calculator()
+{
     delete ui; // メモリを解放
 }
 
-void Calculator::onButtonClicked() {
+void Calculator::onButtonClicked()
+{
     // ボタンのテキストを取得してディスプレイに追加
     QPushButton *button = qobject_cast<QPushButton *>(sender());
-    if (!button) return;
+    if (!button)
+        return;
 
     QString buttonText = button->text();
     ui->display->setText(ui->display->text() + buttonText);
 }
 
-void Calculator::onEqualsClicked() {
+void Calculator::onEqualsClicked()
+{
     // ディスプレイの内容を評価して結果を表示
     QString expression = ui->display->text();
     qDebug() << "Expression:" << expression; // デバッグ用
@@ -47,16 +60,37 @@ void Calculator::onEqualsClicked() {
     QJSEngine engine;
     QJSValue result = engine.evaluate(expression);
 
-    if (result.isError()) {
+    if (result.isError())
+    {
         qDebug() << "Error: Invalid expression";
         ui->display->setText("Error");
-    } else {
+    }
+    else
+    {
         qDebug() << "Result:" << result.toNumber();
         ui->display->setText(QString::number(result.toNumber()));
     }
 }
 
-void Calculator::onClearClicked() {
+void Calculator::onClearClicked()
+{
     // ディスプレイをクリア
     ui->display->clear();
 }
+
+void Calculator::on_button0_clicked()
+{
+    ui->display->setText(ui->display->text() + "0");
+}
+
+void Calculator::on_button1_clicked()
+{
+    ui->display->setText(ui->display->text() + "1");
+}
+
+void Calculator::on_button2_clicked()
+{
+    ui->display->setText(ui->display->text() + "2");
+}
+
+// 他のボタンのスロットも同様に実装

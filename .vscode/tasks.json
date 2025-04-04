@@ -117,5 +117,16 @@
             },
             "problemMatcher": ["$msCompile"]
         },
+        {
+            "label": "clean-QtCalc",
+            "type": "shell",
+            "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "${workspaceFolder}/QtCalc/QtCalc.vcxproj",
+                "/t:Clean", // Clean タスクを実行
+                "/property:Configuration=Debug",
+                "/property:Platform=x64"
+            ],
+        },
     ]
 }
