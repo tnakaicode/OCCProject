@@ -209,10 +209,10 @@ int main()
     std::cout << "Initial value (object3): " << object3->getValue() << std::endl;
 
     // object1 を通じて値を変更
-    object1->setValue(100);
-    object2->setValue(100);
-    object2->setValue(200);
-    object3->setValue(200);
+    object1->setValue(100); // SharedObject: Value changed to 100 by Handle Object1 (Instance ID: 1)
+    object2->setValue(100); // 変更なし
+    object2->setValue(200); // SharedObject: Value changed to 200 by Handle Object2 (Instance ID: 1)
+    object3->setValue(200); // SharedObject: Value changed to 200 by Handle Object3 (Instance ID: 2)
 
     std::cout << "End of main" << std::endl;
     _CrtDumpMemoryLeaks(); // メモリリークをチェック
