@@ -68,7 +68,6 @@ private:
     int value;                                        // 管理する値
     static int nextId;                                // 次に割り当てるID（静的メンバ）
     static std::unordered_map<void *, int> handleIds; // HandleごとのIDを管理
-    static thread_local void *currentHandle;          // 現在操作中のHandle（スレッドローカル）
 
 public:
     // コンストラクタ
@@ -101,19 +100,12 @@ public:
         return handleIds[rawPtr];
     }
 
-    // 現在操作中の Handle を設定
-    static void setCurrentHandle(const Handle(SharedObject) & handle)
-    {
-        currentHandle = handle.get();
-    }
-
-private:
     // 変更を通知する
     void notifyChange()
     {
-        if (currentHandle)
+        int id = getCurrentHandleId();
+        if (id != -1)
         {
-            int id = handleIds[currentHandle];
             std::cout << "SharedObject: Value changed to " << value
                       << " by Handle ID " << id << std::endl;
         }
@@ -123,12 +115,52 @@ private:
                       << " by an unknown Handle" << std::endl;
         }
     }
+
+private:
+    // 現在の Handle ID を取得
+    int getCurrentHandleId() const
+    {
+        void *currentHandle = TrackedHandle<SharedObject>::getCurrentHandle();
+        if (currentHandle && handleIds.find(currentHandle) != handleIds.end())
+        {
+            return handleIds[currentHandle];
+        }
+        return -1; // 未登録の場合
+    }
 };
 
 // 静的メンバの初期化
 int SharedObject::nextId = 1;
 std::unordered_map<void *, int> SharedObject::handleIds;
-thread_local void *SharedObject::currentHandle = nullptr;
+
+// TrackedHandle クラス
+template <typename T>
+class TrackedHandle : public Handle(T)
+{
+private:
+    static thread_local void *currentHandle; // スレッドローカルで現在の Handle を追跡
+
+public:
+    // コンストラクタ
+    TrackedHandle(T * ptr) : Handle(T)(ptr) {}
+
+    // 操作中の Handle を設定
+    T *operator->()
+    {
+        currentHandle = this->get();
+        return Handle(T)::operator->();
+    }
+
+    // 現在の Handle を取得
+    static void *getCurrentHandle()
+    {
+        return currentHandle;
+    }
+};
+
+// スレッドローカル変数の初期化
+template <typename T>
+thread_local void *TrackedHandle<T>::currentHandle = nullptr;
 
 int main()
 {
