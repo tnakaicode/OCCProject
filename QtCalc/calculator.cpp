@@ -1,98 +1,62 @@
 #include "calculator.h"
-#include <iostream> // デバッグ出力用
-#include <QDebug>
-#include <QJSEngine> // 数式を評価するために必要
+#include "ui_calculator.h" // 自動生成されたヘッダーファイルをインクルード
+#include <QDebug>          // デバッグ用
 
-Calculator::Calculator(QWidget *parent) : QWidget(parent)
-{
-    display = new QLineEdit(this);
-    display->setReadOnly(true);
-    display->setAlignment(Qt::AlignRight);
+Calculator::Calculator(QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::Calculator) { // QMainWindow を初期化
+    ui->setupUi(this); // UI を初期化
 
-    layout = new QGridLayout(this);
-    layout->addWidget(display, 0, 0, 1, 4);
-
-    QStringList buttons = {
-        "7", "8", "9", "/",
-        "4", "5", "6", "*",
-        "1", "2", "3", "-",
-        "0", ".", "=", "+"};
-
-    int row = 1, col = 0;
-    for (const QString &text : buttons)
-    {
-        QPushButton *button = createButton(text);
-        layout->addWidget(button, row, col);
-        col++;
-        if (col == 4)
-        {
-            col = 0;
-            row++;
-        }
-    }
-
-    // Clearボタンを追加
-    QPushButton *clearButton = createButton("Clear");
-    layout->addWidget(clearButton, row, 0, 1, 4); // 最後の行に配置
-    connect(clearButton, &QPushButton::clicked, this, &Calculator::clearDisplay);
-
-    setLayout(layout);
+    // ボタンのシグナルとスロットを接続
+    connect(ui->button0, &QPushButton::clicked, this, &Calculator::onButtonClicked);
+    connect(ui->button1, &QPushButton::clicked, this, &Calculator::onButtonClicked);
+    connect(ui->button2, &QPushButton::clicked, this, &Calculator::onButtonClicked);
+    connect(ui->button3, &QPushButton::clicked, this, &Calculator::onButtonClicked);
+    connect(ui->button4, &QPushButton::clicked, this, &Calculator::onButtonClicked);
+    connect(ui->button5, &QPushButton::clicked, this, &Calculator::onButtonClicked);
+    connect(ui->button6, &QPushButton::clicked, this, &Calculator::onButtonClicked);
+    connect(ui->button7, &QPushButton::clicked, this, &Calculator::onButtonClicked);
+    connect(ui->button8, &QPushButton::clicked, this, &Calculator::onButtonClicked);
+    connect(ui->button9, &QPushButton::clicked, this, &Calculator::onButtonClicked);
+    connect(ui->buttonAdd, &QPushButton::clicked, this, &Calculator::onButtonClicked);
+    connect(ui->buttonSubtract, &QPushButton::clicked, this, &Calculator::onButtonClicked);
+    connect(ui->buttonMultiply, &QPushButton::clicked, this, &Calculator::onButtonClicked);
+    connect(ui->buttonDivide, &QPushButton::clicked, this, &Calculator::onButtonClicked);
+    connect(ui->buttonEquals, &QPushButton::clicked, this, &Calculator::onEqualsClicked);
+    connect(ui->buttonClear, &QPushButton::clicked, this, &Calculator::onClearClicked);
 }
 
-QPushButton *Calculator::createButton(const QString &text)
-{
-    QPushButton *button = new QPushButton(text, this);
-    connect(button, &QPushButton::clicked, this, &Calculator::onButtonClicked);
-    return button;
+Calculator::~Calculator() {
+    delete ui; // メモリを解放
 }
 
-void Calculator::onButtonClicked()
-{
+void Calculator::onButtonClicked() {
+    // ボタンのテキストを取得してディスプレイに追加
     QPushButton *button = qobject_cast<QPushButton *>(sender());
-    if (!button)
-    {
-        qDebug() << "Error: sender() returned nullptr"; // デバッグ用
-        return;
-    }
+    if (!button) return;
 
     QString buttonText = button->text();
-    if (buttonText == "=")
-    {
-        QString expression = display->text();
+    ui->display->setText(ui->display->text() + buttonText);
+}
 
-        // expression の内容をデバッグ出力
-        qDebug() << "Expression:" << expression;
+void Calculator::onEqualsClicked() {
+    // ディスプレイの内容を評価して結果を表示
+    QString expression = ui->display->text();
+    qDebug() << "Expression:" << expression; // デバッグ用
 
-        // 空の式の場合の処理
-        if (expression.isEmpty())
-        {
-            qDebug() << "Error: Expression is empty";
-            display->setText("Error");
-            return;
-        }
+    // 簡易的な数式評価 (QJSEngine を使用)
+    QJSEngine engine;
+    QJSValue result = engine.evaluate(expression);
 
-        // QJSEngine を使用して数式を評価
-        QJSEngine engine;
-        QJSValue result = engine.evaluate(expression);
-
-        if (result.isError())
-        {
-            qDebug() << "Error: Invalid expression";
-            display->setText("Error");
-        }
-        else
-        {
-            qDebug() << "Result:" << result.toNumber();
-            display->setText(QString::number(result.toNumber()));
-        }
-    }
-    else
-    {
-        display->setText(display->text() + buttonText);
+    if (result.isError()) {
+        qDebug() << "Error: Invalid expression";
+        ui->display->setText("Error");
+    } else {
+        qDebug() << "Result:" << result.toNumber();
+        ui->display->setText(QString::number(result.toNumber()));
     }
 }
 
-void Calculator::clearDisplay()
-{
-    display->clear(); // ディスプレイをクリア
+void Calculator::onClearClicked() {
+    // ディスプレイをクリア
+    ui->display->clear();
 }

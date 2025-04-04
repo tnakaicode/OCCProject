@@ -75,7 +75,13 @@
     <ClCompile Include="calculator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="calculator.h" />
+    <CustomBuild Include="calculator.ui">
+      <Command>
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\bin\uic.exe %(FullPath) -o $(IntDir)ui_calculator.h
+      </Command>
+      <Outputs>$(IntDir)ui_calculator.h</Outputs>
+      <Message>Generating ui_calculator.h from calculator.ui</Message>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <!-- MOC のカスタムビルドステップ -->
