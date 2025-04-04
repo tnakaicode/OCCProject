@@ -42,6 +42,8 @@ private slots:
     void onLog10Clicked();
     void onSqrtClicked();
     void onAbsClicked();
+    void onLeftParenClicked();
+    void onRightParenClicked();
 
 private:
     Ui::Calculator *ui;

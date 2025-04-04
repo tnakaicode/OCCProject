@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QStatusBar> // ステータスバー用
 #include <QtMath>     // 数学関数用
+#include <QJSEngine>  // 数式評価用
 
 Calculator::Calculator(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::Calculator)
@@ -63,6 +64,10 @@ Calculator::Calculator(QWidget *parent)
     connect(ui->buttonLog10, &QPushButton::clicked, this, &Calculator::onLog10Clicked);
     connect(ui->buttonSqrt, &QPushButton::clicked, this, &Calculator::onSqrtClicked);
     connect(ui->buttonAbs, &QPushButton::clicked, this, &Calculator::onAbsClicked);
+
+    // カッコボタンのシグナルとスロットを接続
+    connect(ui->buttonLeftParen, &QPushButton::clicked, this, &Calculator::onLeftParenClicked);
+    connect(ui->buttonRightParen, &QPushButton::clicked, this, &Calculator::onRightParenClicked);
 }
 
 Calculator::~Calculator()
@@ -96,6 +101,20 @@ void Calculator::onEqualsClicked()
 
     // 簡易的な数式評価 (QJSEngine を使用)
     QJSEngine engine;
+
+    // JavaScriptエンジンに数学関数を登録
+    engine.globalObject().setProperty("sin", engine.evaluate("Math.sin"));
+    engine.globalObject().setProperty("cos", engine.evaluate("Math.cos"));
+    engine.globalObject().setProperty("tan", engine.evaluate("Math.tan"));
+    engine.globalObject().setProperty("asin", engine.evaluate("Math.asin"));
+    engine.globalObject().setProperty("acos", engine.evaluate("Math.acos"));
+    engine.globalObject().setProperty("atan", engine.evaluate("Math.atan"));
+    engine.globalObject().setProperty("exp", engine.evaluate("Math.exp"));
+    engine.globalObject().setProperty("log", engine.evaluate("Math.log"));
+    engine.globalObject().setProperty("log10", engine.evaluate("Math.log10"));
+    engine.globalObject().setProperty("sqrt", engine.evaluate("Math.sqrt"));
+    engine.globalObject().setProperty("abs", engine.evaluate("Math.abs"));
+
     QJSValue result = engine.evaluate(expression);
 
     if (result.isError())
@@ -135,68 +154,57 @@ void Calculator::on_button2_clicked()
 
 void Calculator::onSinClicked()
 {
-    calculateUnaryFunction([](double x)
-                           { return qSin(qDegreesToRadians(x)); });
+    ui->display->setText(ui->display->text() + "sin(");
 }
 
 void Calculator::onCosClicked()
 {
-    calculateUnaryFunction([](double x)
-                           { return qCos(qDegreesToRadians(x)); });
+    ui->display->setText(ui->display->text() + "cos(");
 }
 
 void Calculator::onTanClicked()
 {
-    calculateUnaryFunction([](double x)
-                           { return qTan(qDegreesToRadians(x)); });
+    ui->display->setText(ui->display->text() + "tan(");
 }
 
 void Calculator::onAsinClicked()
 {
-    calculateUnaryFunction([](double x)
-                           { return qRadiansToDegrees(qAsin(x)); });
+    ui->display->setText(ui->display->text() + "asin(");
 }
 
 void Calculator::onAcosClicked()
 {
-    calculateUnaryFunction([](double x)
-                           { return qRadiansToDegrees(qAcos(x)); });
+    ui->display->setText(ui->display->text() + "acos(");
 }
 
 void Calculator::onAtanClicked()
 {
-    calculateUnaryFunction([](double x)
-                           { return qRadiansToDegrees(qAtan(x)); });
+    ui->display->setText(ui->display->text() + "atan(");
 }
 
 void Calculator::onExpClicked()
 {
-    calculateUnaryFunction([](double x)
-                           { return qExp(x); });
+    ui->display->setText(ui->display->text() + "exp(");
 }
 
 void Calculator::onLogClicked()
 {
-    calculateUnaryFunction([](double x)
-                           { return qLn(x); });
+    ui->display->setText(ui->display->text() + "log(");
 }
 
 void Calculator::onLog10Clicked()
 {
-    calculateUnaryFunction([](double x)
-                           { return qLn(x) / qLn(10); });
+    ui->display->setText(ui->display->text() + "log10(");
 }
 
 void Calculator::onSqrtClicked()
 {
-    calculateUnaryFunction([](double x)
-                           { return qSqrt(x); });
+    ui->display->setText(ui->display->text() + "sqrt(");
 }
 
 void Calculator::onAbsClicked()
 {
-    calculateUnaryFunction([](double x)
-                           { return qAbs(x); });
+    ui->display->setText(ui->display->text() + "abs(");
 }
 
 void Calculator::calculateUnaryFunction(std::function<double(double)> func)
@@ -214,4 +222,16 @@ void Calculator::calculateUnaryFunction(std::function<double(double)> func)
     {
         ui->display->setText("Error");
     }
+}
+
+void Calculator::onLeftParenClicked()
+{
+    // ディスプレイに "(" を追加
+    ui->display->setText(ui->display->text() + "(");
+}
+
+void Calculator::onRightParenClicked()
+{
+    // ディスプレイに ")" を追加
+    ui->display->setText(ui->display->text() + ")");
 }
