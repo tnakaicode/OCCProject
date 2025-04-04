@@ -7,7 +7,7 @@
 #include <QGridLayout>
 
 class Calculator : public QWidget {
-    Q_OBJECT
+    Q_OBJECT // このマクロが必要です
 
 public:
     Calculator(QWidget *parent = nullptr);
