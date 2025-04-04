@@ -6,11 +6,11 @@
 #include <QLineEdit>
 #include <QGridLayout>
 
-class Calculator : public QWidget {
-    Q_OBJECT // このマクロが必要です
+class Calculator : public QWidget
+{
+Q_OBJECT // このマクロが必要です
 
-public:
-    Calculator(QWidget *parent = nullptr);
+    public : Calculator(QWidget *parent = nullptr);
 
 private slots:
     void onButtonClicked();

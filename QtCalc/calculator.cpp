@@ -1,8 +1,10 @@
 #include "calculator.h"
 #include <iostream> // デバッグ出力用
 #include <QDebug>
+#include <QJSEngine> // 数式を評価するために必要
 
-Calculator::Calculator(QWidget *parent) : QWidget(parent) {
+Calculator::Calculator(QWidget *parent) : QWidget(parent)
+{
     display = new QLineEdit(this);
     display->setReadOnly(true);
     display->setAlignment(Qt::AlignRight);
@@ -14,15 +16,16 @@ Calculator::Calculator(QWidget *parent) : QWidget(parent) {
         "7", "8", "9", "/",
         "4", "5", "6", "*",
         "1", "2", "3", "-",
-        "0", ".", "=", "+"
-    };
+        "0", ".", "=", "+"};
 
     int row = 1, col = 0;
-    for (const QString &text : buttons) {
+    for (const QString &text : buttons)
+    {
         QPushButton *button = createButton(text);
         layout->addWidget(button, row, col);
         col++;
-        if (col == 4) {
+        if (col == 4)
+        {
             col = 0;
             row++;
         }
@@ -36,39 +39,60 @@ Calculator::Calculator(QWidget *parent) : QWidget(parent) {
     setLayout(layout);
 }
 
-QPushButton *Calculator::createButton(const QString &text) {
+QPushButton *Calculator::createButton(const QString &text)
+{
     QPushButton *button = new QPushButton(text, this);
     connect(button, &QPushButton::clicked, this, &Calculator::onButtonClicked);
     return button;
 }
 
-void Calculator::onButtonClicked() {
+void Calculator::onButtonClicked()
+{
     QPushButton *button = qobject_cast<QPushButton *>(sender());
-    if (!button) {
-        std::cerr << "Error: sender() returned nullptr" << std::endl; // デバッグ用
+    if (!button)
+    {
+        qDebug() << "Error: sender() returned nullptr"; // デバッグ用
         return;
     }
 
     QString buttonText = button->text();
-    if (buttonText == "=") {
-        // Evaluate the expression
+    if (buttonText == "=")
+    {
         QString expression = display->text();
-        qDebug() << "Expression:" << expression; // デバッグ出力
 
-        bool ok;
-        double result = expression.toDouble(&ok); // 簡易的な評価
-        if (ok) {
-            std::cout << "Result: " << result << std::endl; // 結果を出力
-            display->setText(QString::number(result));
-        } else {
-            std::cout << "Error: Invalid expression" << std::endl; // エラーを出力
+        // expression の内容をデバッグ出力
+        qDebug() << "Expression:" << expression;
+
+        // 空の式の場合の処理
+        if (expression.isEmpty())
+        {
+            qDebug() << "Error: Expression is empty";
+            display->setText("Error");
+            return;
+        }
+
+        // QJSEngine を使用して数式を評価
+        QJSEngine engine;
+        QJSValue result = engine.evaluate(expression);
+
+        if (result.isError())
+        {
+            qDebug() << "Error: Invalid expression";
             display->setText("Error");
         }
-    } else {
+        else
+        {
+            qDebug() << "Result:" << result.toNumber();
+            display->setText(QString::number(result.toNumber()));
+        }
+    }
+    else
+    {
         display->setText(display->text() + buttonText);
     }
 }
 
-void Calculator::clearDisplay() {
+void Calculator::clearDisplay()
+{
     display->clear(); // ディスプレイをクリア
 }
