@@ -154,57 +154,57 @@ void Calculator::on_button2_clicked()
 
 void Calculator::onSinClicked()
 {
-    ui->display->setText(ui->display->text() + "sin(");
+    insertTextAtCursor("sin(");
 }
 
 void Calculator::onCosClicked()
 {
-    ui->display->setText(ui->display->text() + "cos(");
+    insertTextAtCursor("cos(");
 }
 
 void Calculator::onTanClicked()
 {
-    ui->display->setText(ui->display->text() + "tan(");
+    insertTextAtCursor("tan(");
 }
 
 void Calculator::onAsinClicked()
 {
-    ui->display->setText(ui->display->text() + "asin(");
+    insertTextAtCursor("asin(");
 }
 
 void Calculator::onAcosClicked()
 {
-    ui->display->setText(ui->display->text() + "acos(");
+    insertTextAtCursor("acos(");
 }
 
 void Calculator::onAtanClicked()
 {
-    ui->display->setText(ui->display->text() + "atan(");
+    insertTextAtCursor("atan(");
 }
 
 void Calculator::onExpClicked()
 {
-    ui->display->setText(ui->display->text() + "exp(");
+    insertTextAtCursor("exp(");
 }
 
 void Calculator::onLogClicked()
 {
-    ui->display->setText(ui->display->text() + "log(");
+    insertTextAtCursor("log(");
 }
 
 void Calculator::onLog10Clicked()
 {
-    ui->display->setText(ui->display->text() + "log10(");
+    insertTextAtCursor("log10(");
 }
 
 void Calculator::onSqrtClicked()
 {
-    ui->display->setText(ui->display->text() + "sqrt(");
+    insertTextAtCursor("sqrt(");
 }
 
 void Calculator::onAbsClicked()
 {
-    ui->display->setText(ui->display->text() + "abs(");
+    insertTextAtCursor("abs(");
 }
 
 void Calculator::calculateUnaryFunction(std::function<double(double)> func)
@@ -226,12 +226,47 @@ void Calculator::calculateUnaryFunction(std::function<double(double)> func)
 
 void Calculator::onLeftParenClicked()
 {
-    // ディスプレイに "(" を追加
-    ui->display->setText(ui->display->text() + "(");
+    // 選択範囲をカッコで囲む
+    QLineEdit *display = ui->display;
+    QString selectedText = display->selectedText();
+    if (!selectedText.isEmpty())
+    {
+        insertTextAtCursor("(" + selectedText + ")");
+    }
+    else
+    {
+        insertTextAtCursor("(");
+    }
 }
 
 void Calculator::onRightParenClicked()
 {
-    // ディスプレイに ")" を追加
-    ui->display->setText(ui->display->text() + ")");
+    insertTextAtCursor(")");
+}
+
+void Calculator::insertTextAtCursor(const QString &text)
+{
+    QLineEdit *display = ui->display;
+    int cursorPosition = display->cursorPosition();
+
+    // 選択範囲を取得
+    QString selectedText = display->selectedText();
+    if (!selectedText.isEmpty())
+    {
+        // 選択範囲を置き換える
+        QString currentText = display->text();
+        int selectionStart = display->selectionStart();
+        int selectionEnd = selectionStart + selectedText.length();
+        QString newText = currentText.left(selectionStart) + text + currentText.mid(selectionEnd);
+        display->setText(newText);
+        display->setCursorPosition(selectionStart + text.length());
+    }
+    else
+    {
+        // カーソル位置に挿入
+        QString currentText = display->text();
+        QString newText = currentText.left(cursorPosition) + text + currentText.mid(cursorPosition);
+        display->setText(newText);
+        display->setCursorPosition(cursorPosition + text.length());
+    }
 }

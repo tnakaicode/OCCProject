@@ -50,6 +50,7 @@ private:
     QLabel *timeLabel; // ステータスバーに表示する時刻用ラベル
     QTimer *timer;     // 時刻更新用タイマー
     void calculateUnaryFunction(std::function<double(double)> func);
+    void insertTextAtCursor(const QString &text);
 };
 
 #endif // CALCULATOR_H
