@@ -60,7 +60,7 @@ public:
 int main()
 {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-    // int* leak = new int[10]; // 解放されないメモリ
+    int* leak = new int[10]; // 解放されないメモリ
     //  Handle(MyClass) handle1 = new MyClass(); // ヒープ上にオブジェクトを作成
     {
         // Handle(MyClass) handle2 = handle1; // 所有権を共有
