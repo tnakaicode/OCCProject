@@ -7,6 +7,9 @@
 #include <crtdbg.h>
 #include <functional>
 #include <vector>
+#include <unordered_map>
+#include <thread>
+#include <mutex>
 
 class MyClass : public Standard_Transient
 {
@@ -62,7 +65,10 @@ public:
 class SharedObject : public Standard_Transient
 {
 private:
-    int value; // 管理する値
+    int value;                                        // 管理する値
+    static int nextId;                                // 次に割り当てるID（静的メンバ）
+    static std::unordered_map<void *, int> handleIds; // HandleごとのIDを管理
+    static thread_local void *currentHandle;          // 現在操作中のHandle（スレッドローカル）
 
 public:
     // コンストラクタ
@@ -84,13 +90,45 @@ public:
         return value;
     }
 
+    // Handle に一意の ID を割り当てる
+    static int registerHandle(const Handle(SharedObject) & handle)
+    {
+        void *rawPtr = handle.get();
+        if (handleIds.find(rawPtr) == handleIds.end())
+        {
+            handleIds[rawPtr] = nextId++;
+        }
+        return handleIds[rawPtr];
+    }
+
+    // 現在操作中の Handle を設定
+    static void setCurrentHandle(const Handle(SharedObject) & handle)
+    {
+        currentHandle = handle.get();
+    }
+
 private:
     // 変更を通知する
     void notifyChange()
     {
-        std::cout << "SharedObject: Value changed to " << value << std::endl;
+        if (currentHandle)
+        {
+            int id = handleIds[currentHandle];
+            std::cout << "SharedObject: Value changed to " << value
+                      << " by Handle ID " << id << std::endl;
+        }
+        else
+        {
+            std::cout << "SharedObject: Value changed to " << value
+                      << " by an unknown Handle" << std::endl;
+        }
     }
 };
+
+// 静的メンバの初期化
+int SharedObject::nextId = 1;
+std::unordered_map<void *, int> SharedObject::handleIds;
+thread_local void *SharedObject::currentHandle = nullptr;
 
 int main()
 {
@@ -129,7 +167,17 @@ int main()
     std::cout << "Initial value (object2): " << object2->getValue() << std::endl;
     std::cout << "Initial value (object3): " << object3->getValue() << std::endl;
 
+    // 各 Handle に ID を割り当て
+    int id1 = SharedObject::registerHandle(object1);
+    int id2 = SharedObject::registerHandle(object2);
+    int id3 = SharedObject::registerHandle(object3);
+
+    std::cout << "Handle IDs: object1=" << id1
+              << ", object2=" << id2
+              << ", object3=" << id3 << std::endl;
+
     // object1 を通じて値を変更
+    SharedObject::setCurrentHandle(object1);
     object1->setValue(100);
     object2->setValue(100);
     object2->setValue(200);
