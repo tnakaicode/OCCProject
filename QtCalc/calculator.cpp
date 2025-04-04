@@ -4,6 +4,7 @@
 #include <QGridLayout>
 #include <QDateTime>
 #include <QStatusBar> // ステータスバー用
+#include <QtMath>     // 数学関数用
 
 Calculator::Calculator(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::Calculator)
@@ -49,6 +50,19 @@ Calculator::Calculator(QWidget *parent)
     connect(ui->buttonDivide, &QPushButton::clicked, this, &Calculator::onButtonClicked);
     connect(ui->buttonEquals, &QPushButton::clicked, this, &Calculator::onEqualsClicked);
     connect(ui->buttonClear, &QPushButton::clicked, this, &Calculator::onClearClicked);
+
+    // 初等関数ボタンのシグナルとスロットを接続
+    connect(ui->buttonSin, &QPushButton::clicked, this, &Calculator::onSinClicked);
+    connect(ui->buttonCos, &QPushButton::clicked, this, &Calculator::onCosClicked);
+    connect(ui->buttonTan, &QPushButton::clicked, this, &Calculator::onTanClicked);
+    connect(ui->buttonAsin, &QPushButton::clicked, this, &Calculator::onAsinClicked);
+    connect(ui->buttonAcos, &QPushButton::clicked, this, &Calculator::onAcosClicked);
+    connect(ui->buttonAtan, &QPushButton::clicked, this, &Calculator::onAtanClicked);
+    connect(ui->buttonExp, &QPushButton::clicked, this, &Calculator::onExpClicked);
+    connect(ui->buttonLog, &QPushButton::clicked, this, &Calculator::onLogClicked);
+    connect(ui->buttonLog10, &QPushButton::clicked, this, &Calculator::onLog10Clicked);
+    connect(ui->buttonSqrt, &QPushButton::clicked, this, &Calculator::onSqrtClicked);
+    connect(ui->buttonAbs, &QPushButton::clicked, this, &Calculator::onAbsClicked);
 }
 
 Calculator::~Calculator()
@@ -118,3 +132,86 @@ void Calculator::on_button2_clicked()
 }
 
 // 他のボタンのスロットも同様に実装
+
+void Calculator::onSinClicked()
+{
+    calculateUnaryFunction([](double x)
+                           { return qSin(qDegreesToRadians(x)); });
+}
+
+void Calculator::onCosClicked()
+{
+    calculateUnaryFunction([](double x)
+                           { return qCos(qDegreesToRadians(x)); });
+}
+
+void Calculator::onTanClicked()
+{
+    calculateUnaryFunction([](double x)
+                           { return qTan(qDegreesToRadians(x)); });
+}
+
+void Calculator::onAsinClicked()
+{
+    calculateUnaryFunction([](double x)
+                           { return qRadiansToDegrees(qAsin(x)); });
+}
+
+void Calculator::onAcosClicked()
+{
+    calculateUnaryFunction([](double x)
+                           { return qRadiansToDegrees(qAcos(x)); });
+}
+
+void Calculator::onAtanClicked()
+{
+    calculateUnaryFunction([](double x)
+                           { return qRadiansToDegrees(qAtan(x)); });
+}
+
+void Calculator::onExpClicked()
+{
+    calculateUnaryFunction([](double x)
+                           { return qExp(x); });
+}
+
+void Calculator::onLogClicked()
+{
+    calculateUnaryFunction([](double x)
+                           { return qLn(x); });
+}
+
+void Calculator::onLog10Clicked()
+{
+    calculateUnaryFunction([](double x)
+                           { return qLn(x) / qLn(10); });
+}
+
+void Calculator::onSqrtClicked()
+{
+    calculateUnaryFunction([](double x)
+                           { return qSqrt(x); });
+}
+
+void Calculator::onAbsClicked()
+{
+    calculateUnaryFunction([](double x)
+                           { return qAbs(x); });
+}
+
+void Calculator::calculateUnaryFunction(std::function<double(double)> func)
+{
+    QString expression = ui->display->text();
+    bool ok;
+    double value = expression.toDouble(&ok);
+
+    if (ok)
+    {
+        double result = func(value);
+        ui->display->setText(QString::number(result));
+    }
+    else
+    {
+        ui->display->setText("Error");
+    }
+}
