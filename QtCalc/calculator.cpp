@@ -1,4 +1,6 @@
 #include "calculator.h"
+#include <iostream> // デバッグ出力用
+#include <QDebug>
 
 Calculator::Calculator(QWidget *parent) : QWidget(parent) {
     display = new QLineEdit(this);
@@ -42,17 +44,24 @@ QPushButton *Calculator::createButton(const QString &text) {
 
 void Calculator::onButtonClicked() {
     QPushButton *button = qobject_cast<QPushButton *>(sender());
-    if (!button) return;
+    if (!button) {
+        std::cerr << "Error: sender() returned nullptr" << std::endl; // デバッグ用
+        return;
+    }
 
     QString buttonText = button->text();
     if (buttonText == "=") {
         // Evaluate the expression
         QString expression = display->text();
+        qDebug() << "Expression:" << expression; // デバッグ出力
+
         bool ok;
         double result = expression.toDouble(&ok); // 簡易的な評価
         if (ok) {
+            std::cout << "Result: " << result << std::endl; // 結果を出力
             display->setText(QString::number(result));
         } else {
+            std::cout << "Error: Invalid expression" << std::endl; // エラーを出力
             display->setText("Error");
         }
     } else {
