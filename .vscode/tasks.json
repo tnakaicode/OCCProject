@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "build-AppProject",
             "type": "shell",
             "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "args": [
@@ -17,7 +17,7 @@
             "problemMatcher": ["$msCompile"]
         },
         {
-            "label": "build-qt",
+            "label": "build-QtProject",
             "type": "shell",
             "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "args": [
@@ -29,11 +29,11 @@
                 "kind": "build",
                 "isDefault": false
             },
-            //"dependsOn": ["build-qt-clean"], // ビルド前にクリーンを実行
+            //"dependsOn": ["clean-QtProject"], // ビルド前にクリーンを実行
             "problemMatcher": ["$msCompile"]
         },
         {
-            "label": "build-qt-clean",
+            "label": "clean-QtProject",
             "type": "shell",
             "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "args": [
@@ -45,7 +45,7 @@
             "problemMatcher": []
         },
         {
-            "label": "build-opencascade-viewer",
+            "label": "build-OpenCASCADEViewer",
             "type": "shell",
             "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "args": [
@@ -62,11 +62,11 @@
                 "kind": "build",
                 "isDefault": false
             },
-            "dependsOn": ["build-opencascade-viewer-clean"], // ビルド前にクリーンを実行
+            "dependsOn": ["clean-OpenCASCADEViewer"], // ビルド前にクリーンを実行
             "problemMatcher": ["$msCompile"]
         },
         {
-            "label": "build-opencascade-viewer-clean",
+            "label": "clean-OpenCASCADEViewer",
             "type": "shell",
             "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "args": [
@@ -78,20 +78,24 @@
             "problemMatcher": []
         },
         {
-            "label": "deactivate-conda",
+            "label": "build-MemoryProject",
             "type": "shell",
-            "command": "conda",
-            "args": ["deactivate"],
-            "problemMatcher": [],
+            "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "${workspaceFolder}/MemoryProject/MemoryProject.vcxproj",
+                "/property:Configuration=Debug",
+                "/property:Platform=x64"
+            ],
             "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            }
+                "reveal": "always", // ターミナルを表示
+                "panel": "shared",  // 同じターミナルを使用
+                "clear": false      // ターミナルをクリアしない
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": ["$msCompile"]
         },
-        {
-            "label": "build-and-deactivate",
-            "dependsOn": ["build", "deactivate-conda"],
-            "problemMatcher": []
-        }
     ]
 }

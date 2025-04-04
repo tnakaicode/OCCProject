@@ -1,39 +1,15 @@
 {
   "version": "0.2.0",
+  "projectName": "OpenCASCADEViewer",
   "configurations": [
     {
-      "name": "Python Debugger: Current File",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${file}",
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}"
-    },
-    {
-      "name": "Debug AppProject",
+      "name": "Debug Current Project",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/AppProject/x64/Debug/AppProject.exe",
+      "program": "${workspaceFolder}/${fileBasenameNoExtension}/x64/Debug/${fileBasenameNoExtension}.exe", // プログラム名を変数で参照
       "args": [],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/AppProject",
-      "environment": [
-        {
-          "name": "PATH",
-          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\win64\\vc14\\bin;C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\bin;C:\\OpenCASCADE-7.7.0-vc14-64\\qt5.11.2-vc14-64\\plugins\\platforms;%PATH%"
-        }
-      ],
-      "console": "externalTerminal",
-      "preLaunchTask": "build"
-    },
-    {
-      "name": "Debug QtProject",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/QtProject/x64/Debug/QtProject.exe",
-      "args": [],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/QtProject",
+      "cwd": "${workspaceFolder}/${fileBasenameNoExtension}", // 作業ディレクトリも変数で参照
       "environment": [
         {
           "name": "PATH",
@@ -73,7 +49,15 @@
         }
       ],
       "console": "integratedTerminal",
-      "preLaunchTask": "build-qt"
+      "preLaunchTask": "build-${fileBasenameNoExtension}", // ビルドタスクを指定
+    },
+    {
+      "name": "Python Debugger: Current File",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
     },
     {
       "name": "C/C++ Runner: Debug Session",
@@ -93,54 +77,6 @@
           "ignoreFailures": true
         }
       ]
-    },
-    {
-      "name": "Debug OpenCASCADEViewer",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/OpenCASCADEViewer/x64/Debug/OpenCASCADEViewer.exe",
-      "args": [],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/OpenCASCADEViewer",
-      "environment": [
-        {
-          "name": "PATH",
-          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\win64\\vc14\\bin;C:\\OpenCASCADE-7.5.0-vc14-64\\openvr-1.14.15-64\\bin\\win64;C:\\OpenCASCADE-7.5.0-vc14-64\\ffmpeg-3.3.4-64\\bin;%PATH%"
-        },
-        {
-          "name": "CSF_GraphicShr",
-          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\win64\\vc14\\bin\\TKOpenGl.dll"
-        },
-        {
-          "name": "CSF_UnitsLexicon",
-          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\src\\UnitsAPI\\Lexi_Expr.dat"
-        },
-        {
-          "name": "CSF_UnitsDefinition",
-          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\src\\UnitsAPI\\Units.dat"
-        },
-        {
-          "name": "CSF_SHMessage",
-          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\src\\SHMessage"
-        },
-        {
-          "name": "CSF_XSMessage",
-          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\src\\XSMessage"
-        },
-        {
-          "name": "CSF_TObjMessage",
-          "value": "C:\\OpenCASCADE-7.7.0-vc14-64\\opencascade-7.7.0\\src\\TObjMessage"
-        }
-      ],
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen", // デバッグ用コンソールを開かない
-      "presentation": {
-        "hidden": false,
-        "group": "",
-        "order": 1,
-        "clear": false // ターミナルをクリアしない
-      },
-      "preLaunchTask": "build-opencascade-viewer",
     }
   ]
 }
