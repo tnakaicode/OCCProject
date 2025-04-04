@@ -158,6 +158,10 @@ private:
     }
 };
 
+// 静的メンバ変数の定義
+int SharedObject::nextId = 1;
+std::unordered_map<void *, int> SharedObject::handleIds;
+
 int main()
 {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -187,9 +191,9 @@ int main()
     // node2->prev = node1; // node2 が node1 を弱参照
 
     // ヒープメモリ上のインスタンスを共有
-    Handle(SharedObject) object1 = new SharedObject(42);
-    Handle(SharedObject) object2 = object1; // object1 と同じインスタンスを共有
-    Handle(SharedObject) object3 = new SharedObject(50);
+    TrackedHandle<SharedObject> object1 = new SharedObject(42);
+    TrackedHandle<SharedObject> object2 = object1; // object1 と同じインスタンスを共有
+    TrackedHandle<SharedObject> object3 = new SharedObject(50);
 
     std::cout << "Initial value (object1): " << object1->getValue() << std::endl;
     std::cout << "Initial value (object2): " << object2->getValue() << std::endl;
