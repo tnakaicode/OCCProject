@@ -26,6 +26,11 @@ Calculator::Calculator(QWidget *parent) : QWidget(parent) {
         }
     }
 
+    // Clearボタンを追加
+    QPushButton *clearButton = createButton("Clear");
+    layout->addWidget(clearButton, row, 0, 1, 4); // 最後の行に配置
+    connect(clearButton, &QPushButton::clicked, this, &Calculator::clearDisplay);
+
     setLayout(layout);
 }
 
@@ -43,15 +48,18 @@ void Calculator::onButtonClicked() {
     if (buttonText == "=") {
         // Evaluate the expression
         QString expression = display->text();
-        double result = 0;
-        try {
-            result = expression.toDouble(); // Simplified for demonstration
-        } catch (...) {
+        bool ok;
+        double result = expression.toDouble(&ok); // 簡易的な評価
+        if (ok) {
+            display->setText(QString::number(result));
+        } else {
             display->setText("Error");
-            return;
         }
-        display->setText(QString::number(result));
     } else {
         display->setText(display->text() + buttonText);
     }
+}
+
+void Calculator::clearDisplay() {
+    display->clear(); // ディスプレイをクリア
 }

@@ -14,6 +14,7 @@ public:
 
 private slots:
     void onButtonClicked();
+    void clearDisplay(); // Clearボタン用のスロット
 
 private:
     QLineEdit *display;
