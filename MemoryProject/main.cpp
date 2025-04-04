@@ -5,6 +5,8 @@
 #include <memory>
 #include <cstdlib>
 #include <crtdbg.h>
+#include <functional>
+#include <vector>
 
 class MyClass : public Standard_Transient
 {
@@ -59,19 +61,34 @@ public:
 
 class SharedObject : public Standard_Transient
 {
-public:
-    int value;
+private:
+    int value; // 管理する値
 
+public:
+    // コンストラクタ
     SharedObject(int val) : value(val) {}
 
+    // 値を設定し、変更を通知
     void setValue(int val)
     {
-        value = val;
+        if (value != val)
+        {
+            value = val;
+            notifyChange(); // 変更を通知
+        }
     }
 
+    // 値を取得
     int getValue() const
     {
         return value;
+    }
+
+private:
+    // 変更を通知する
+    void notifyChange()
+    {
+        std::cout << "SharedObject: Value changed to " << value << std::endl;
     }
 };
 
@@ -106,16 +123,16 @@ int main()
     // ヒープメモリ上のインスタンスを共有
     Handle(SharedObject) object1 = new SharedObject(42);
     Handle(SharedObject) object2 = object1; // object1 と同じインスタンスを共有
+    Handle(SharedObject) object3 = new SharedObject(50);
 
     std::cout << "Initial value (object1): " << object1->getValue() << std::endl;
     std::cout << "Initial value (object2): " << object2->getValue() << std::endl;
+    std::cout << "Initial value (object3): " << object3->getValue() << std::endl;
 
     // object1 を通じて値を変更
     object1->setValue(100);
-
-    // object2 にも変更が反映される
-    std::cout << "Updated value (object1): " << object1->getValue() << std::endl;
-    std::cout << "Updated value (object2): " << object2->getValue() << std::endl;
+    object2->setValue(100);
+    object2->setValue(200);
 
     std::cout << "End of main" << std::endl;
     _CrtDumpMemoryLeaks(); // メモリリークをチェック
