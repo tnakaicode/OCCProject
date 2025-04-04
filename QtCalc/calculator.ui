@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>415</width>
     <height>300</height>
    </rect>
   </property>
@@ -16,11 +16,11 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="4">
     <widget class="QLineEdit" name="display">
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
      <property name="alignment">
       <set>Qt::AlignRight</set>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -123,16 +123,16 @@
     </widget>
    </item>
    <item row="4" column="3">
-    <widget class="QPushButton" name="buttonEquals">
+    <widget class="QPushButton" name="buttonAdd">
      <property name="text">
-      <string>=</string>
+      <string>+</string>
      </property>
     </widget>
    </item>
    <item row="5" column="3">
-    <widget class="QPushButton" name="buttonAdd">
+    <widget class="QPushButton" name="buttonEquals">
      <property name="text">
-      <string>+</string>
+      <string>=</string>
      </property>
     </widget>
    </item>

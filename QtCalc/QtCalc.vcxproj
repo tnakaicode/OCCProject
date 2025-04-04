@@ -75,6 +75,7 @@
     <ClCompile Include="calculator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <!-- calculator.ui を CustomBuild のみで定義 -->
     <CustomBuild Include="calculator.ui">
       <Command>
         C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\bin\uic.exe %(FullPath) -o $(IntDir)ui_calculator.h
@@ -97,6 +98,15 @@
   <PropertyGroup>
     <QtVersion>5.11.2</QtVersion> <!-- 使用している Qt のバージョン -->
     <QtInstallDir>C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64</QtInstallDir> <!-- Qt のインストールパス -->
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- Qt Designer のパスを指定 -->
+    <QtDesignerPath>C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\bin\designer.exe</QtDesignerPath>
+  </PropertyGroup>
+  <!-- <ItemGroup> の None 定義を削除 -->
+  <PropertyGroup>
+    <!-- Qt Designer を開くためのカスタムツール -->
+    <CustomToolForUI>$(QtDesignerPath)</CustomToolForUI>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>
