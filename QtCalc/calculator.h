@@ -1,9 +1,11 @@
 #ifndef CALCULATOR_H
 #define CALCULATOR_H
 
-#include <QMainWindow> // QMainWindow をインクルード
-#include <QJSEngine>   // 数式評価用
-#include <QJSValue>    // 数式評価結果
+#include <QMainWindow>
+#include <QJSEngine> // 数式評価用
+#include <QJSValue>  // 数式評価結果
+#include <QTimer>
+#include <QLabel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -12,8 +14,8 @@ namespace Ui
 }
 QT_END_NAMESPACE
 
-class Calculator : public QWidget
-{ // QMainWindow → QWidget に変更
+class Calculator : public QMainWindow
+{
     Q_OBJECT
 
 public:
@@ -27,22 +29,12 @@ private slots:
     void on_button0_clicked();
     void on_button1_clicked();
     void on_button2_clicked();
-    // void on_button3_clicked();
-    // void on_button4_clicked();
-    // void on_button5_clicked();
-    // void on_button6_clicked();
-    // void on_button7_clicked();
-    // void on_button8_clicked();
-    // void on_button9_clicked();
-    // void on_buttonAdd_clicked();
-    // void on_buttonSubtract_clicked();
-    // void on_buttonMultiply_clicked();
-    // void on_buttonDivide_clicked();
-    // void on_buttonEquals_clicked();
-    // void on_buttonClear_clicked();
+    void updateTime(); // 時刻を更新するスロット
 
 private:
-    Ui::Calculator *ui; // 自動生成された UI クラスのポインタ
+    Ui::Calculator *ui;
+    QLabel *timeLabel; // ステータスバーに表示する時刻用ラベル
+    QTimer *timer;     // 時刻更新用タイマー
 };
 
 #endif // CALCULATOR_H

@@ -1,12 +1,29 @@
 #include "calculator.h"
-#include "ui_calculator.h" // 自動生成されたヘッダーファイルをインクルード
-#include <QDebug>          // デバッグ用
+#include "ui_calculator.h"
+#include <QDebug>
 #include <QGridLayout>
+#include <QDateTime>
+#include <QStatusBar> // ステータスバー用
 
 Calculator::Calculator(QWidget *parent)
-    : QWidget(parent), ui(new Ui::Calculator)
+    : QMainWindow(parent), ui(new Ui::Calculator)
 {
-    ui->setupUi(this);
+    // QWidget を QMainWindow の中央に埋め込む
+    QWidget *centralWidget = new QWidget(this);
+    ui->setupUi(centralWidget);
+    setCentralWidget(centralWidget);
+
+    // ステータスバーに時刻表示用の QLabel を追加
+    timeLabel = new QLabel(this);
+    statusBar()->addPermanentWidget(timeLabel);
+
+    // QTimer を設定して 0.1 秒ごとに時刻を更新
+    timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &Calculator::updateTime);
+    timer->start(200); // 0.1 秒ごとにタイマーを発火
+
+    // 初期の時刻を表示
+    updateTime();
 
     // 親ウィジェットにレイアウトを適用
     if (!this->layout())
@@ -36,7 +53,14 @@ Calculator::Calculator(QWidget *parent)
 
 Calculator::~Calculator()
 {
-    delete ui; // メモリを解放
+    delete ui;
+}
+
+void Calculator::updateTime()
+{
+    // 現在の時刻を取得して QLabel に表示
+    QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd ddd hh:mm:ss.zzz");
+    timeLabel->setText(currentTime);
 }
 
 void Calculator::onButtonClicked()
