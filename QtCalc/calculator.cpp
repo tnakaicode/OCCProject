@@ -1,4 +1,5 @@
 #include "calculator.h"
+#include "exprtk.hpp" // exprtk ライブラリをインクルード
 #include "ui_calculator.h"
 #include <QDebug>
 #include <QGridLayout>
@@ -76,24 +77,43 @@ void Calculator::onButtonClicked()
 
 void Calculator::onEqualsClicked()
 {
-    // ディスプレイの内容を評価して結果を表示
+    // ディスプレイの内容を取得
     QString expression = ui->display->text();
     qDebug() << "Expression:" << expression; // デバッグ用
 
-    // 簡易的な数式評価 (QJSEngine を使用)
-    QJSEngine engine;
-    QJSValue result = engine.evaluate(expression);
+    // exprtk を使用して数式を評価
+    typedef exprtk::symbol_table<double> symbol_table_t;
+    typedef exprtk::expression<double> expression_t;
+    typedef exprtk::parser<double> parser_t;
 
-    if (result.isError())
+    symbol_table_t symbol_table;
+    double dummy = 0.0; // ダミー変数を登録（必要に応じて）
+    symbol_table.add_variable("dummy", dummy);
+    symbol_table.add_constants(); // 定数 (pi, e など) を追加
+    qDebug() << "Symbol table initialized";
+
+    expression_t expr;
+    expr.register_symbol_table(symbol_table);
+    qDebug() << "Expression registered";
+
+    parser_t parser;
+    if (!parser.compile(expression.toUtf8().constData(), expr))
     {
+        // 数式が無効な場合はエラーを表示
         qDebug() << "Error: Invalid expression";
+        qDebug() << "Parser error: " << QString::fromStdString(parser.error());
         ui->display->setText("Error");
+        return;
     }
-    else
-    {
-        qDebug() << "Result:" << result.toNumber();
-        ui->display->setText(QString::number(result.toNumber()));
-    }
+
+    qDebug() << "Parser succeeded";
+
+    // 数式を評価して結果を取得
+    double result = expr.value();
+    qDebug() << "Result:" << result;
+
+    // 結果をディスプレイに表示
+    ui->display->setText(QString::number(result));
 }
 
 void Calculator::onClearClicked()
