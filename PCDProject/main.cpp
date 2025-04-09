@@ -29,7 +29,7 @@ int main()
 
     // 球体の点群データを生成
     std::vector<std::array<float, 3>> spherePoints;
-    const int numPoints = 10000;
+    const int numPoints = 1000000;
     const float radius = 1.0f;
 
     for (int i = 0; i < numPoints; ++i)
