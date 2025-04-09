@@ -1,10 +1,31 @@
 #include "Viewer.h"
+#include <AIS_ViewCube.hxx>
+#include <Graphic3d_TransformPers.hxx>
+#include <Graphic3d_ZLayerId.hxx>
 #include <iostream>
 
 // グローバル変数
 Handle(V3d_Viewer) viewer;
 Handle(V3d_View) view;
 Handle(AIS_InteractiveContext) context;
+
+// 座標系を表示する関数
+void DisplayViewCube()
+{
+    Handle(AIS_ViewCube) viewCube = new AIS_ViewCube();
+    viewCube->SetSize(50.0);                         // サイズを小さく設定
+    viewCube->SetBoxColor(Quantity_NOC_GRAY);        // ボックスの色を設定
+    viewCube->SetDrawAxes(Standard_True);            // 軸を描画
+    viewCube->SetTransparency(0.5);                  // 透明度を設定
+    viewCube->SetZLayer(Graphic3d_ZLayerId_Topmost); // 最上位レイヤーに設定
+
+    // オフセットを調整して右下に配置
+    Graphic3d_Vec2i offset(100, 100); // ウィンドウの右下からのオフセット（ピクセル単位）
+    viewCube->SetTransformPersistence(new Graphic3d_TransformPers(
+        Graphic3d_TMF_TriedronPers, Aspect_TOTP_RIGHT_LOWER, offset));
+
+    context->Display(viewCube, Standard_True);
+}
 
 // ウィンドウプロシージャ
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -148,6 +169,9 @@ void InitializeViewer(const std::string &windowTitle)
     }
 
     context = new AIS_InteractiveContext(viewer);
+
+    // 座標系を表示
+    DisplayViewCube();
 }
 
 // 点群を表示する関数

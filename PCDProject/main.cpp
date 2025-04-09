@@ -27,26 +27,28 @@ int main()
 {
     std::cout << "Starting Point Cloud Processing..." << std::endl;
 
-    // 球体の点群データを生成
-    std::vector<std::array<float, 3>> spherePoints;
+    // 楕円の点群データを生成
+    std::vector<std::array<float, 3>> ellipsePoints;
     const int numPoints = 1000000;
-    const float radius = 1.0f;
+    const float radiusX = 2.0f; // 長軸
+    const float radiusY = 1.0f; // 短軸
+    const float radiusZ = 1.5f; // Z軸方向のスケール
 
     for (int i = 0; i < numPoints; ++i)
     {
         float theta = static_cast<float>(rand()) / RAND_MAX * 2.0f * M_PI;     // 0 to 2π
         float phi = acos(2.0f * static_cast<float>(rand()) / RAND_MAX - 1.0f); // 0 to π
-        float x = radius * sin(phi) * cos(theta);
-        float y = radius * sin(phi) * sin(theta);
-        float z = radius * cos(phi);
-        spherePoints.push_back({x, y, z});
+        float x = radiusX * sin(phi) * cos(theta);
+        float y = radiusY * sin(phi) * sin(theta);
+        float z = radiusZ * cos(phi);
+        ellipsePoints.push_back({x, y, z});
     }
 
     // Viewerを初期化
     InitializeViewer("Point Cloud Viewer");
 
     // 点群を表示
-    DisplayPointCloud(spherePoints);
+    DisplayPointCloud(ellipsePoints);
 
     std::cout << "Point Cloud Processing Completed." << std::endl;
 
