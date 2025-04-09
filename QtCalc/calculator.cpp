@@ -89,7 +89,7 @@ Calculator::~Calculator()
 void Calculator::updateTime()
 {
     // 現在の時刻を取得して QLabel に表示
-    QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd ddd hh:mm:ss.zzz");
+    QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd ddd hh:mm:ss");
     timeLabel->setText(currentTime);
 }
 
