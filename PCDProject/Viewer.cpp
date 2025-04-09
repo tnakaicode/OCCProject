@@ -7,12 +7,14 @@ Handle(V3d_View) view;
 Handle(AIS_InteractiveContext) context;
 
 // ウィンドウプロシージャ
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
     static bool isDragging = false;
     static bool isPanning = false;
     static int lastX = 0, lastY = 0;
 
-    switch (msg) {
+    switch (msg)
+    {
     case WM_LBUTTONDOWN:
         isDragging = true;
         lastX = LOWORD(lParam);
@@ -39,13 +41,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         break;
 
     case WM_MOUSEMOVE:
-        if (isDragging && !view.IsNull()) {
+        if (isDragging && !view.IsNull())
+        {
             int x = LOWORD(lParam);
             int y = HIWORD(lParam);
             view->Rotation(x, y);
             lastX = x;
             lastY = y;
-        } else if (isPanning && !view.IsNull()) {
+        }
+        else if (isPanning && !view.IsNull())
+        {
             int x = LOWORD(lParam);
             int y = HIWORD(lParam);
             double dx = static_cast<double>(x - lastX);
@@ -57,11 +62,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         break;
 
     case WM_MOUSEWHEEL:
-        if (!view.IsNull()) {
+        if (!view.IsNull())
+        {
             int delta = GET_WHEEL_DELTA_WPARAM(wParam);
-            if (delta > 0) {
+            if (delta > 0)
+            {
                 view->SetZoom(0.9);
-            } else {
+            }
+            else
+            {
                 view->SetZoom(1.1);
             }
         }
@@ -78,16 +87,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 }
 
 // Viewerを初期化する関数
-void InitializeViewer(const std::string& windowTitle) {
+void InitializeViewer(const std::string &windowTitle)
+{
     HINSTANCE hInstance = GetModuleHandle(nullptr);
-    const wchar_t* className = L"OpenCASCADEViewer";
+    const wchar_t *className = L"OpenCASCADEViewer";
 
     WNDCLASS wc = {};
     wc.lpfnWndProc = WndProc;
     wc.hInstance = hInstance;
     wc.lpszClassName = className;
 
-    if (!RegisterClass(&wc)) {
+    if (!RegisterClass(&wc))
+    {
         std::cerr << "Failed to register window class." << std::endl;
         return;
     }
@@ -97,7 +108,8 @@ void InitializeViewer(const std::string& windowTitle) {
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600,
         nullptr, nullptr, hInstance, nullptr);
 
-    if (!hwnd) {
+    if (!hwnd)
+    {
         std::cerr << "Failed to create window." << std::endl;
         return;
     }
@@ -115,7 +127,8 @@ void InitializeViewer(const std::string& windowTitle) {
     Handle(WNT_Window) wntWindow = new WNT_Window(hwnd);
     view->SetWindow(wntWindow);
 
-    if (!wntWindow->IsMapped()) {
+    if (!wntWindow->IsMapped())
+    {
         wntWindow->Map();
     }
 
@@ -123,10 +136,12 @@ void InitializeViewer(const std::string& windowTitle) {
 }
 
 // 点群を表示する関数
-void DisplayPointCloud(const std::vector<std::array<float, 3>>& points) {
+void DisplayPointCloud(const std::vector<std::array<float, 3>> &points)
+{
     Handle(TColgp_HArray1OfPnt) pointArray = new TColgp_HArray1OfPnt(1, static_cast<Standard_Integer>(points.size()));
-    for (Standard_Integer i = 0; i < points.size(); ++i) {
-        const auto& point = points[i];
+    for (Standard_Integer i = 0; i < points.size(); ++i)
+    {
+        const auto &point = points[i];
         pointArray->SetValue(i + 1, gp_Pnt(point[0], point[1], point[2]));
     }
 

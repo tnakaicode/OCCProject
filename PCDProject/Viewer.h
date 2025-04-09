@@ -20,8 +20,8 @@ extern Handle(V3d_View) view;
 extern Handle(AIS_InteractiveContext) context;
 
 // 関数宣言
-void InitializeViewer(const std::string& windowTitle);
-void DisplayPointCloud(const std::vector<std::array<float, 3>>& points);
+void InitializeViewer(const std::string &windowTitle);
+void DisplayPointCloud(const std::vector<std::array<float, 3>> &points);
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #endif // VIEWER_H
