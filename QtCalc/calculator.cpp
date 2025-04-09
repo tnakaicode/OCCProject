@@ -7,6 +7,7 @@
 #include <QStatusBar> // ステータスバー用
 #include <QtMath>     // 数学関数用
 #include <QJSEngine>  // 数式評価用
+#include <QKeyEvent>  // キーボードイベント用
 
 Calculator::Calculator(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::Calculator)
@@ -69,6 +70,15 @@ Calculator::Calculator(QWidget *parent)
     // カッコボタンのシグナルとスロットを接続
     connect(ui->buttonLeftParen, &QPushButton::clicked, this, &Calculator::onLeftParenClicked);
     connect(ui->buttonRightParen, &QPushButton::clicked, this, &Calculator::onRightParenClicked);
+
+    // ディスプレイにイベントフィルタを設定
+    ui->display->installEventFilter(this);
+
+    // 度からラジアンに変換するボタンのシグナルとスロットを接続
+    connect(ui->buttonDegToRad, &QPushButton::clicked, this, &Calculator::onDegToRadClicked);
+
+    // 小数点ボタンのシグナルとスロットを接続
+    connect(ui->buttonDecimal, &QPushButton::clicked, this, &Calculator::onDecimalClicked);
 }
 
 Calculator::~Calculator()
@@ -275,4 +285,56 @@ void Calculator::insertTextAtCursor(const QString &text)
         display->setText(newText);
         display->setCursorPosition(cursorPosition + text.length());
     }
+}
+
+// イベントフィルタをオーバーライド
+bool Calculator::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == ui->display && event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+
+        // 許可するキーを定義
+        QString allowedKeys = "0123456789+-*/().abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        if (allowedKeys.contains(keyEvent->text()) ||
+            keyEvent->key() == Qt::Key_Backspace ||
+            keyEvent->key() == Qt::Key_Delete ||
+            keyEvent->key() == Qt::Key_Space)
+        {
+            return false; // 通常の処理を続行
+        }
+        else
+        {
+            return true; // 不正なキー入力を無効化
+        }
+    }
+
+    // 他のイベントはデフォルト処理
+    return QMainWindow::eventFilter(obj, event);
+}
+
+void Calculator::onDegToRadClicked()
+{
+    // ディスプレイの内容を取得
+    QString expression = ui->display->text();
+    bool ok;
+    double degreeValue = expression.toDouble(&ok);
+
+    if (ok)
+    {
+        // 度をラジアンに変換
+        double radianValue = qDegreesToRadians(degreeValue);
+        ui->display->setText(QString::number(radianValue));
+    }
+    else
+    {
+        // エラー処理
+        ui->display->setText("Error");
+    }
+}
+
+void Calculator::onDecimalClicked()
+{
+    // ディスプレイに小数点を追加
+    insertTextAtCursor(".");
 }

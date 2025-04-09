@@ -44,6 +44,8 @@ private slots:
     void onAbsClicked();
     void onLeftParenClicked();
     void onRightParenClicked();
+    void onDegToRadClicked();
+    void onDecimalClicked();
 
 private:
     Ui::Calculator *ui;
@@ -51,6 +53,9 @@ private:
     QTimer *timer;     // 時刻更新用タイマー
     void calculateUnaryFunction(std::function<double(double)> func);
     void insertTextAtCursor(const QString &text);
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
 };
 
 #endif // CALCULATOR_H
