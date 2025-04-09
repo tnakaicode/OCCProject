@@ -76,7 +76,7 @@ def read_step_file_with_names_colors(filename):
 
     locs = []
 
-    def _get_sub_shapes(lab, loc):
+    def _get_sub_shapes(lab=TDF_Label(), loc=TopLoc_Location(), depth=0, prefix="0:"):
         # global cnt, lvl
         # cnt += 1
         # print("\n[%d] level %d, handling LABEL %s\n" % (cnt, lvl, _get_label_name(lab)))
@@ -102,8 +102,9 @@ def read_step_file_with_names_colors(filename):
         shape_tool.GetComponents(lab, l_comps)
         # print("Nb components  :", l_comps.Length())
         # print()
+            
         name = lab.GetLabelName()
-        print("Name :", name)
+        print(f"Name & Label: {lab.EntryDump()} {name}")
 
         if shape_tool.IsAssembly(lab):
             l_c = TDF_LabelSequence()
@@ -175,7 +176,7 @@ def read_step_file_with_names_colors(filename):
                 color_set = True
                 n = c.Name(c.Red(), c.Green(), c.Blue())
                 print(
-                    "    instance color Name & RGB: ",
+                    "instance color Name & RGB: ",
                     c,
                     n,
                     c.Red(),
@@ -195,7 +196,7 @@ def read_step_file_with_names_colors(filename):
 
                     n = c.Name(c.Red(), c.Green(), c.Blue())
                     print(
-                        "    shape color Name & RGB: ",
+                        "shape color Name & RGB: ",
                         c,
                         n,
                         c.Red(),
@@ -276,7 +277,7 @@ def read_step_file_with_names_colors(filename):
 
     def _get_shapes():
         labels = TDF_LabelSequence()
-        shape_tool.GetFreeShapes(labels)
+        shape_tool.GetShapes(labels)
         # global cnt
         # cnt += 1
 

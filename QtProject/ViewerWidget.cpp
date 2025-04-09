@@ -73,6 +73,7 @@ void ViewerWidget::loadStepFile(const char *filePath)
     reader.SetColorMode(true);
     reader.SetNameMode(true);
     reader.SetMatMode(true);
+    reader.SetPropsMode(true);
     // reader.SetGDTMode(true);
     // reader.SetViewMode(true);
 
@@ -92,22 +93,24 @@ void ViewerWidget::loadStepFile(const char *filePath)
 
     // すべての形状を取得
     TDF_LabelSequence allShapes;
+    // shapeTool->GetFreeShapes(allShapes);
     shapeTool->GetShapes(allShapes);
     std::cout << "Number of shapes: " << allShapes.Length() << std::endl;
 
     // ツリー構造を出力
-    std::cout << "STEP File Tree Structure:" << std::endl;
-    for (Standard_Integer i = 1; i <= allShapes.Length(); i++)
-    {
-        TDF_Label rootLabel = allShapes.Value(i);
-        printLabelTree(rootLabel, shapeTool, colorTool, 0);
-    }
+    // std::cout << "STEP File Tree Structure:" << std::endl;
+    // for (Standard_Integer i = 1; i <= allShapes.Length(); i++)
+    //{
+    //    TDF_Label rootLabel = allShapes.Value(i);
+    //    printLabelTree(rootLabel, shapeTool, colorTool, 0);
+    //}
 
     // 形状を表示
     for (Standard_Integer i = 1; i <= allShapes.Length(); i++)
     {
         TDF_Label rootLabel = allShapes.Value(i);
-        displayShapeWithLocation(rootLabel, shapeTool, colorTool, TopLoc_Location(), 0);
+        TopLoc_Location location = shapeTool->GetLocation(rootLabel);
+        displayShapeWithLocation(rootLabel, shapeTool, colorTool, location, 0);
     }
 
     m_view->FitAll();
@@ -115,82 +118,87 @@ void ViewerWidget::loadStepFile(const char *filePath)
 
 void ViewerWidget::displayShapeWithLocation(const TDF_Label &label, const Handle(XCAFDoc_ShapeTool) & shapeTool, const Handle(XCAFDoc_ColorTool) & colorTool, const TopLoc_Location &parentLocation, int depth)
 {
-    // ラベルに関連付けられた形状を取得
-    if (shapeTool->IsShape(label))
+    // ラベルがアセンブリの場合
+    if (shapeTool->IsAssembly(label))
     {
-        TopoDS_Shape shape = shapeTool->GetShape(label);
-        if (!shape.IsNull())
+        std::cout << std::setw(depth * 2) << "" << "- Assembly: ";
+
+        // ラベルの名前を取得して出力
+        if (label.IsAttribute(TDataStd_Name::GetID()))
         {
-            if (label.IsAttribute(TDataStd_Name::GetID()))
+            Handle(TDataStd_Name) nameAttribute;
+            if (label.FindAttribute(TDataStd_Name::GetID(), nameAttribute))
             {
-                Handle(TDataStd_Name) nameAttribute;
-                if (label.FindAttribute(TDataStd_Name::GetID(), nameAttribute))
-                {
-                    TCollection_ExtendedString name = nameAttribute->Get();
-                    std::wcout << name.ToWideString() << std::endl; // ラベルの名前を出力
-                }
+                TCollection_ExtendedString name = nameAttribute->Get();
+                std::wcout << name.ToWideString();
             }
+        }
+        std::cout << std::endl;
 
-            // インデントを設定してツリー構造を表示
-            std::cout << std::setw(depth * 2) << "" << "- ";
-            // ラベルの名前を取得して出力
-
-            // ラベルのエントリ情報を取得して表示 (例: 0:1:1)
-            std::ostringstream entryStream;
-            label.EntryDump(entryStream);   // EntryDump に std::ostringstream を渡す
-            std::cout << entryStream.str(); // ストリームの内容を文字列として出力
-            // TCollection_AsciiString entry;
-            // label.EntryDump(entry);
-            // std::cout << entry.ToCString() << " ";
-
-            // ラベルのローカル Location を取得
-            //TopLoc_Location localLocation = shapeTool->GetLocation(label);
-            TopLoc_Location localLocation = shape.Location();
-
-            // 親の Location を適用
-            TopLoc_Location combinedLocation = parentLocation * localLocation;
-
-            // Location 情報を出力
-            std::cout << " (Location: ";
-            printLocation(localLocation);
-            std::cout << ")" << std::endl;
-
-            // 形状に Location を適用
-            TopoDS_Shape transformedShape = shape.Moved(combinedLocation);
-
-            // 色を取得
-            Quantity_Color color;
-            bool hasColor = colorTool->GetColor(label, XCAFDoc_ColorSurf, color);
-
-            // AIS_Shape を作成して色を設定
-            Handle(AIS_Shape) aisShape = new AIS_Shape(transformedShape);
-            if (hasColor)
-            {
-                aisShape->SetColor(color);
-            }
-
-            // 形状を表示
-            m_context->SetDisplayMode(aisShape, AIS_Shaded, Standard_True);
-            m_context->Display(aisShape, Standard_True);
+        // 子ラベルを再帰的に処理
+        TDF_LabelSequence children;
+        shapeTool->GetComponents(label, children);
+        for (Standard_Integer i = 1; i <= children.Length(); i++)
+        {
+            TDF_Label childLabel = children.Value(i);
+            displayShapeWithLocation(childLabel, shapeTool, colorTool, parentLocation, depth + 1);
         }
     }
-
-    // 子ラベルを再帰的に処理
-    TDF_LabelSequence children;
-    shapeTool->GetSubShapes(label, children);
-    for (Standard_Integer i = 1; i <= children.Length(); i++)
+    // ラベルが単純形状の場合
+    else if (shapeTool->IsSimpleShape(label))
     {
-        displayShapeWithLocation(children.Value(i), shapeTool, colorTool, parentLocation, depth + 1);
+        std::cout << std::setw(depth * 2) << "" << "- SimpleShape: ";
+
+        // ラベルの名前を取得して出力
+        if (label.IsAttribute(TDataStd_Name::GetID()))
+        {
+            Handle(TDataStd_Name) nameAttribute;
+            if (label.FindAttribute(TDataStd_Name::GetID(), nameAttribute))
+            {
+                TCollection_ExtendedString name = nameAttribute->Get();
+                std::wcout << name.ToWideString();
+            }
+        }
+
+        // ラベルのローカル Location を取得
+        TopoDS_Shape shape = shapeTool->GetShape(label);
+        TopLoc_Location localLocation = shape.Location();
+
+        // 親の Location を適用
+        TopLoc_Location combinedLocation = parentLocation * localLocation;
+
+        // Location 情報を出力
+        std::cout << " (Location: ";
+        printLocation(combinedLocation);
+        std::cout << ")" << std::endl;
+
+        // 形状に Location を適用
+        TopoDS_Shape transformedShape = shape.Moved(combinedLocation);
+
+        // 色を取得
+        Quantity_Color color;
+        bool hasColor = colorTool->GetColor(label, XCAFDoc_ColorSurf, color);
+
+        // AIS_Shape を作成して色を設定
+        Handle(AIS_Shape) aisShape = new AIS_Shape(transformedShape);
+        if (hasColor)
+        {
+            aisShape->SetColor(color);
+        }
+
+        // 形状を表示
+        m_context->SetDisplayMode(aisShape, AIS_Shaded, Standard_True);
+        m_context->Display(aisShape, Standard_True);
     }
 }
 
 void ViewerWidget::printLocation(const TopLoc_Location &location)
 {
-    //if (location.IsIdentity())
+    // if (location.IsIdentity())
     //{
-    //    std::cout << "Identity";
-    //    return;
-    //}
+    //     std::cout << "Identity";
+    //     return;
+    // }
 
     // 変換行列を取得
     gp_Trsf transformation = location.Transformation();
