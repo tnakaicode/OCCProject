@@ -45,6 +45,7 @@
         $(IntDir);
         %(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>
