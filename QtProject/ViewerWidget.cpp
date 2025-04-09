@@ -116,7 +116,11 @@ void ViewerWidget::loadStepFile(const char *filePath)
     m_view->FitAll();
 }
 
-void ViewerWidget::displayShapeWithLocation(const TDF_Label &label, const Handle(XCAFDoc_ShapeTool) & shapeTool, const Handle(XCAFDoc_ColorTool) & colorTool, const TopLoc_Location &parentLocation, int depth)
+void ViewerWidget::displayShapeWithLocation(const TDF_Label &label,
+                                            const Handle(XCAFDoc_ShapeTool) & shapeTool,
+                                            const Handle(XCAFDoc_ColorTool) & colorTool,
+                                            const TopLoc_Location &parentLocation,
+                                            int depth)
 {
     // ラベルがアセンブリの場合
     if (shapeTool->IsAssembly(label))
@@ -137,28 +141,20 @@ void ViewerWidget::displayShapeWithLocation(const TDF_Label &label, const Handle
 
         // 子ラベルを再帰的に処理
         TDF_LabelSequence children;
-        shapeTool->GetComponents(label, children);
+        shapeTool->GetSubShapes(label, children);
         for (Standard_Integer i = 1; i <= children.Length(); i++)
         {
             TDF_Label childLabel = children.Value(i);
-            displayShapeWithLocation(childLabel, shapeTool, colorTool, parentLocation, depth + 1);
+            TopLoc_Location childLocation = shapeTool->GetLocation(childLabel);
+
+            // 再帰的に Location を適用
+            displayShapeWithLocation(childLabel, shapeTool, colorTool, parentLocation * childLocation, depth + 1);
         }
     }
     // ラベルが単純形状の場合
     else if (shapeTool->IsSimpleShape(label))
     {
         std::cout << std::setw(depth * 2) << "" << "- SimpleShape: ";
-
-        // ラベルの名前を取得して出力
-        if (label.IsAttribute(TDataStd_Name::GetID()))
-        {
-            Handle(TDataStd_Name) nameAttribute;
-            if (label.FindAttribute(TDataStd_Name::GetID(), nameAttribute))
-            {
-                TCollection_ExtendedString name = nameAttribute->Get();
-                std::wcout << name.ToWideString();
-            }
-        }
 
         // ラベルのローカル Location を取得
         TopoDS_Shape shape = shapeTool->GetShape(label);
@@ -169,8 +165,23 @@ void ViewerWidget::displayShapeWithLocation(const TDF_Label &label, const Handle
 
         // Location 情報を出力
         std::cout << " (Location: ";
-        printLocation(combinedLocation);
-        std::cout << ")" << std::endl;
+        printLocation(combinedLocation); // 修正: combinedLocation を出力
+        std::cout << ")";
+
+        // ラベルの名前を取得して出力
+        if (label.IsAttribute(TDataStd_Name::GetID()))
+        {
+            Handle(TDataStd_Name) nameAttribute;
+            if (label.FindAttribute(TDataStd_Name::GetID(), nameAttribute))
+            {
+                TCollection_ExtendedString name = nameAttribute->Get();
+                std::wcout << name.ToWideString() << std::endl;
+            }
+        }
+        else
+        {
+            std::cout << std::endl;
+        }
 
         // 形状に Location を適用
         TopoDS_Shape transformedShape = shape.Moved(combinedLocation);
