@@ -128,5 +128,36 @@
                 "/property:Platform=x64"
             ],
         },
+        {
+            "label": "build-PCDProject",
+            "type": "shell",
+            "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "${workspaceFolder}/PCDProject/PCDProject.vcxproj",
+                "/property:Configuration=Debug",
+                "/property:Platform=x64"
+            ],
+            "presentation": {
+                "reveal": "always", // ターミナルを表示
+                "panel": "shared",  // 同じターミナルを使用
+                "clear": false      // ターミナルをクリアしない
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": ["$msCompile"]
+        },
+        {
+            "label": "clean-PCDProject",
+            "type": "shell",
+            "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "${workspaceFolder}/PCDProject/PCDProject.vcxproj",
+                "/t:Clean", // Clean タスクを実行
+                "/property:Configuration=Debug",
+                "/property:Platform=x64"
+            ],
+        },
     ]
 }
