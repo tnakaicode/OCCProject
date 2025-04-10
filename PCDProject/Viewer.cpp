@@ -78,9 +78,13 @@ void PrintGraphicDriverInfo(const Handle(OpenGl_GraphicDriver) & graphicDriver)
         const Handle(OpenGl_Context) &glContext = graphicDriver->GetSharedContext();
         if (!glContext.IsNull())
         {
-            std::cout << "  OpenGL Version: " << glContext->VersionMajor() << std::endl;
+            std::cout << "  OpenGL Version: " << glContext->VersionMajor() << "." << glContext->VersionMinor() << std::endl;
             std::cout << "  Vendor: " << glContext->Vendor() << std::endl;
             std::cout << "  Renderer: " << glContext->RenderingContext() << std::endl;
+            // std::cout << "  GLSL Version: " << glContext->GLSLVersion() << std::endl;
+            std::cout << "  Max Texture Size: " << glContext->MaxTextureSize() << std::endl;
+            std::cout << "  Max Combined Texture Units: " << glContext->MaxCombinedTextureUnits() << std::endl;
+            // std::cout << "  Max Samples: " << glContext->MaxSamples() << std::endl;
         }
         else
         {
@@ -103,6 +107,14 @@ void PrintGraphicDriverInfo(const Handle(OpenGl_GraphicDriver) & graphicDriver)
         // VSync 情報を取得
         bool isVSyncEnabled = graphicDriver->IsVerticalSync();
         std::cout << "  Vertical Sync: " << (isVSyncEnabled ? "Enabled" : "Disabled") << std::endl;
+
+        // その他の情報を取得
+        const OpenGl_Caps &caps = graphicDriver->Options();
+        std::cout << "  Double Buffer: " << (caps.buffersNoSwap ? "Disabled" : "Enabled") << std::endl;
+        // std::cout << "  Stereo: " << (caps.stereo ? "Enabled" : "Disabled") << std::endl;
+        // std::cout << "  MSAA Samples: " << caps.msaaSamples << std::endl;
+        // std::cout << "  Max Clip Planes: " << caps.maxClipPlanes << std::endl;
+        // std::cout << "  Max Lights: " << caps.maxLights << std::endl;
     }
     else
     {
