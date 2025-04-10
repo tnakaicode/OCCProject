@@ -5,11 +5,48 @@
 #include <Graphic3d_ZLayerId.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <windows.h>
 
 // グローバル変数
 Handle(V3d_Viewer) viewer;
 Handle(V3d_View) view;
 Handle(AIS_InteractiveContext) context;
+
+// 設定ファイルのパス
+const std::string CONFIG_FILE = "viewer_config.txt";
+
+// ウィンドウのサイズと位置を保存
+void SaveWindowConfig(HWND hwnd)
+{
+    RECT rect;
+    if (GetWindowRect(hwnd, &rect))
+    {
+        std::ofstream configFile(CONFIG_FILE, std::ios::out);
+        if (configFile.is_open())
+        {
+            configFile << rect.left << " " << rect.top << " "
+                       << (rect.right - rect.left) << " " << (rect.bottom - rect.top) << std::endl;
+            configFile.close();
+        }
+    }
+}
+
+// ウィンドウのサイズと位置を読み込み
+void LoadWindowConfig(HWND hwnd)
+{
+    std::ifstream configFile(CONFIG_FILE, std::ios::in);
+    if (configFile.is_open())
+    {
+        int x, y, width, height;
+        if (configFile >> x >> y >> width >> height)
+        {
+            SetWindowPos(hwnd, nullptr, x, y, width, height, SWP_NOZORDER | SWP_NOACTIVATE);
+        }
+        configFile.close();
+    }
+}
 
 // 座標系を表示する関数
 void DisplayViewCube()
@@ -43,6 +80,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     switch (msg)
     {
+    case WM_CREATE:
+        // 設定ファイルからサイズと位置を読み込む
+        LoadWindowConfig(hwnd);
+        break;
+
     case WM_LBUTTONDOWN:
     {
         // マウスクリックで選択を処理
@@ -144,6 +186,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_DESTROY:
+        // ウィンドウのサイズと位置を保存
+        SaveWindowConfig(hwnd);
         PostQuitMessage(0);
         break;
 
