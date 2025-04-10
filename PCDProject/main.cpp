@@ -42,6 +42,7 @@ int main()
 
     // ビューを一括更新
     view->Redraw();
+    view->FitAll(); // 全体を表示
 
     std::cout << "Point Cloud Processing Completed." << std::endl;
 

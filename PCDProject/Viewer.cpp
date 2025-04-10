@@ -76,7 +76,15 @@ struct ViewerData
 // ウィンドウプロシージャ
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+
+    static bool isDragging = false;
+    static bool isPanning = false;
+    static int lastX = 0, lastY = 0;
+
+    // 一度だけ viewerData を取得してローカル変数にキャッシュ
     ViewerData *viewerData = reinterpret_cast<ViewerData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+    Handle(AIS_InteractiveContext) context = viewerData ? viewerData->context : nullptr;
+    Handle(V3d_View) view = viewerData ? viewerData->view : nullptr;
 
     switch (msg)
     {
@@ -87,11 +95,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     case WM_LBUTTONDOWN:
     {
-        if (viewerData)
+        if (context && view)
         {
-            Handle(AIS_InteractiveContext) context = viewerData->context;
-            Handle(V3d_View) view = viewerData->view;
-
             // 左ボタン押下時の処理
             POINT point;
             GetCursorPos(&point);
@@ -111,9 +116,84 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     std::cout << "ViewCube clicked!" << std::endl;
                 }
             }
+            else
+            {
+                isDragging = true;
+                lastX = LOWORD(lParam);
+                lastY = HIWORD(lParam);
+                view->StartRotation(lastX, lastY);
+            }
         }
     }
-        SetCapture(hwnd); // マウスキャプチャを設定
+        SetCapture(hwnd);
+        break;
+
+    case WM_LBUTTONUP:
+        isDragging = false;
+        ReleaseCapture();
+        break;
+
+    case WM_RBUTTONDOWN:
+        isPanning = true;
+        lastX = LOWORD(lParam);
+        lastY = HIWORD(lParam);
+        SetCapture(hwnd);
+        break;
+
+    case WM_RBUTTONUP:
+        isPanning = false;
+        ReleaseCapture();
+        break;
+
+    case WM_MOUSEMOVE:
+        if (isDragging && !view.IsNull())
+        {
+            int x = LOWORD(lParam);
+            int y = HIWORD(lParam);
+            view->Rotation(x, y);
+            lastX = x;
+            lastY = y;
+        }
+        else if (isPanning && !view.IsNull())
+        {
+            int x = LOWORD(lParam);
+            int y = HIWORD(lParam);
+            double dx = static_cast<double>(x - lastX);
+            double dy = static_cast<double>(y - lastY);
+            view->Pan(dx, dy);
+            lastX = x;
+            lastY = y;
+        }
+        break;
+
+    case WM_MOUSEWHEEL:
+        if (!view.IsNull())
+        {
+            int delta = GET_WHEEL_DELTA_WPARAM(wParam);
+            if (delta < 0)
+            {
+                view->SetZoom(0.9);
+            }
+            else
+            {
+                view->SetZoom(1.1);
+            }
+        }
+        break;
+
+    case WM_SIZE:
+        if (!view.IsNull())
+        {
+            RECT rect;
+            GetClientRect(hwnd, &rect);
+            int width = rect.right - rect.left;
+            int height = rect.bottom - rect.top;
+            if (width > 0 && height > 0)
+            {
+                view->SetWindow(view->Window());
+                view->MustBeResized();
+            }
+        }
         break;
 
     case WM_DESTROY:
@@ -142,6 +222,9 @@ void InitializeViewer(const std::string &windowTitle,
 {
     HINSTANCE hInstance = GetModuleHandle(nullptr);
     const wchar_t *className = L"OpenCASCADEViewer";
+
+    // `context` と `view` をウィンドウに関連付け
+    ViewerData *viewerData = new ViewerData{context, view};
 
     WNDCLASS wc = {};
     wc.lpfnWndProc = WndProc;
@@ -185,8 +268,6 @@ void InitializeViewer(const std::string &windowTitle,
 
     context = new AIS_InteractiveContext(viewer);
 
-    // `context` と `view` をウィンドウに関連付け
-    ViewerData *viewerData = new ViewerData{context, view};
     SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(viewerData));
 }
 
