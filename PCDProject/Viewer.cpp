@@ -223,8 +223,6 @@ void InitializeViewer(const std::string &windowTitle,
     HINSTANCE hInstance = GetModuleHandle(nullptr);
     const wchar_t *className = L"OpenCASCADEViewer";
 
-    // `context` と `view` をウィンドウに関連付け
-    ViewerData *viewerData = new ViewerData{context, view};
 
     WNDCLASS wc = {};
     wc.lpfnWndProc = WndProc;
@@ -268,6 +266,8 @@ void InitializeViewer(const std::string &windowTitle,
 
     context = new AIS_InteractiveContext(viewer);
 
+    // `context` と `view` をウィンドウに関連付け
+    ViewerData *viewerData = new ViewerData{context, view};
     SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(viewerData));
 }
 
