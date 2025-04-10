@@ -223,7 +223,6 @@ void InitializeViewer(const std::string &windowTitle,
     HINSTANCE hInstance = GetModuleHandle(nullptr);
     const wchar_t *className = L"OpenCASCADEViewer";
 
-
     WNDCLASS wc = {};
     wc.lpfnWndProc = WndProc;
     wc.hInstance = hInstance;
@@ -235,10 +234,10 @@ void InitializeViewer(const std::string &windowTitle,
         return;
     }
 
-    HWND hwnd = CreateWindowEx(
-        0, className, std::wstring(windowTitle.begin(), windowTitle.end()).c_str(),
-        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600,
-        nullptr, nullptr, hInstance, nullptr);
+    HWND hwnd = CreateWindowEx(0, className,
+                               std::wstring(windowTitle.begin(), windowTitle.end()).c_str(),
+                               WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600,
+                               nullptr, nullptr, hInstance, nullptr);
 
     if (!hwnd)
     {
