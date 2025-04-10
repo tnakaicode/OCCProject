@@ -4,6 +4,7 @@
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Shape.hxx>
 #include <AIS_PointCloud.hxx>
+#include <AIS_Point.hxx>
 #include <Graphic3d_AspectFillArea3d.hxx>
 #include <Graphic3d_TransformPers.hxx>
 #include <Graphic3d_ZLayerId.hxx>
@@ -27,6 +28,7 @@
 #include <OSD_Environment.hxx>
 #include <Prs3d_ShadingAspect.hxx>
 #include <Quantity_Color.hxx>
+#include <Geom_CartesianPoint.hxx>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -63,6 +65,76 @@ void LoadWindowConfig(HWND hwnd)
             SetWindowPos(hwnd, nullptr, x, y, width, height, SWP_NOZORDER | SWP_NOACTIVATE);
         }
         configFile.close();
+    }
+}
+
+void PrintGraphicDriverInfo(const Handle(OpenGl_GraphicDriver) & graphicDriver)
+{
+    if (!graphicDriver.IsNull())
+    {
+        std::cout << "GraphicDriver Information:" << std::endl;
+
+        // OpenGL コンテキスト情報を取得
+        const Handle(OpenGl_Context) &glContext = graphicDriver->GetSharedContext();
+        if (!glContext.IsNull())
+        {
+            std::cout << "  OpenGL Version: " << glContext->VersionMajor() << std::endl;
+            std::cout << "  Vendor: " << glContext->Vendor() << std::endl;
+            std::cout << "  Renderer: " << glContext->RenderingContext() << std::endl;
+        }
+        else
+        {
+            std::cout << "  OpenGL Context: Not available" << std::endl;
+        }
+
+        // メモリ情報を取得
+        Standard_Size freeMemory = 0;
+        TCollection_AsciiString memoryInfo;
+        if (graphicDriver->MemoryInfo(freeMemory, memoryInfo))
+        {
+            std::cout << "  Free GPU Memory: " << freeMemory << " bytes" << std::endl;
+            std::cout << "  Memory Info: " << memoryInfo.ToCString() << std::endl;
+        }
+        else
+        {
+            std::cout << "  Memory Info: Not available" << std::endl;
+        }
+
+        // VSync 情報を取得
+        bool isVSyncEnabled = graphicDriver->IsVerticalSync();
+        std::cout << "  Vertical Sync: " << (isVSyncEnabled ? "Enabled" : "Disabled") << std::endl;
+    }
+    else
+    {
+        std::cout << "GraphicDriver is null." << std::endl;
+    }
+}
+
+void PrintContextInfo(const Handle(AIS_InteractiveContext) & context)
+{
+    if (!context.IsNull())
+    {
+        std::cout << "AIS_InteractiveContext Information:" << std::endl;
+
+        // 表示されているオブジェクト数を取得
+        AIS_ListOfInteractive displayedObjects;
+        context->DisplayedObjects(displayedObjects);
+        int displayedCount = displayedObjects.Extent();
+        std::cout << "  Number of Displayed Objects: " << displayedCount << std::endl;
+
+        // 選択されているオブジェクト数を取得
+        int selectedCount = context->NbSelected();
+        std::cout << "  Number of Selected Objects: " << selectedCount << std::endl;
+
+        // ハイライトされているオブジェクト数を取得
+        AIS_ListOfInteractive highlightedObjects;
+        // context->ObjectsByDisplayStatus(PrsMgr_DisplayStatus_Hilighted, highlightedObjects);
+        // int highlightedCount = highlightedObjects.Extent();
+        // std::cout << "  Number of Highlighted Objects: " << highlightedCount << std::endl;
+    }
+    else
+    {
+        std::cout << "AIS_InteractiveContext is null." << std::endl;
     }
 }
 
@@ -160,7 +232,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             int y = HIWORD(lParam);
             double dx = static_cast<double>(x - lastX);
             double dy = static_cast<double>(y - lastY);
-            view->Pan(dx, dy);
+            view->Pan(static_cast<Standard_Integer>(dx), static_cast<Standard_Integer>(dy));
             lastX = x;
             lastY = y;
         }
@@ -264,6 +336,23 @@ void InitializeViewer(const std::string &windowTitle,
     }
 
     context = new AIS_InteractiveContext(viewer);
+    context = new AIS_InteractiveContext(viewer);
+
+    // OpenGL コンテキストの初期化を確認
+    if (!graphicDriver->InitContext())
+    {
+        std::cerr << "Failed to initialize OpenGL context." << std::endl;
+        return;
+    }
+
+    if (context.IsNull())
+    {
+        std::cerr << "Failed to initialize AIS_InteractiveContext." << std::endl;
+        return;
+    }
+
+    PrintGraphicDriverInfo(graphicDriver);
+    PrintContextInfo(context);
 
     // `context` と `view` をウィンドウに関連付け
     ViewerData *viewerData = new ViewerData{context, view};
@@ -325,4 +414,14 @@ void DisplayPointCloud(const Handle(AIS_InteractiveContext) & context,
     aisPointCloud->SetPoints(pointArray);
 
     context->Display(aisPointCloud, Standard_True);
+}
+
+void DisplayPoint(Handle(AIS_InteractiveContext) & context, float x, float y, float z)
+{
+    // 点を表す Prs3d_Point を作成
+    Handle(Geom_CartesianPoint) point = new Geom_CartesianPoint(x, y, z);
+    Handle(AIS_Point) aisPoint = new AIS_Point(point);
+
+    // 点をコンテキストに追加
+    context->Display(aisPoint, Standard_True);
 }

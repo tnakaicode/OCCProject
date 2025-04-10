@@ -40,6 +40,23 @@ int main()
     // 点群を表示
     DisplayPointCloud(context, ellipsePoints);
 
+    // 楕円体を覆う長方形の頂点を計算
+    std::vector<std::array<float, 3>> boundingBoxVertices = {
+        {-radiusX, -radiusY, -radiusZ}, // 頂点1
+        {radiusX, -radiusY, -radiusZ},  // 頂点2
+        {radiusX, radiusY, -radiusZ},   // 頂点3
+        {-radiusX, radiusY, -radiusZ},  // 頂点4
+        {-radiusX, -radiusY, radiusZ},  // 頂点5
+        {radiusX, -radiusY, radiusZ},   // 頂点6
+        {radiusX, radiusY, radiusZ},    // 頂点7
+        {-radiusX, radiusY, radiusZ}    // 頂点8
+    };
+
+    // 頂点を描画
+    for (const auto &vertex : boundingBoxVertices)
+    {
+        DisplayPoint(context, vertex[0], vertex[1], vertex[2]);
+    }
     view->FitAll(); // 全体を表示
 
     std::cout << "Point Cloud Processing Completed." << std::endl;

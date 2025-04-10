@@ -37,6 +37,8 @@ void DisplayEllipsoid(const Handle(AIS_InteractiveContext) & context,
 void DisplayPointCloud(const Handle(AIS_InteractiveContext) & context,
                        const std::vector<std::array<float, 3>> &points);
 
+void DisplayPoint(Handle(AIS_InteractiveContext) & context, float x, float y, float z);
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #endif // VIEWER_H
