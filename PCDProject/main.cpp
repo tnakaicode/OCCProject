@@ -35,7 +35,7 @@ int main()
 
     // 楕円の点群データを生成
     std::vector<std::array<float, 3>> ellipsePoints;
-    const int numPoints = 1000000;
+    const int numPoints = 10000000;
     const float radiusX = 2.0f; // 長軸
     const float radiusY = 1.0f; // 短軸
     const float radiusZ = 1.5f; // Z軸方向のスケール

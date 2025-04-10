@@ -1,7 +1,9 @@
 #include "Viewer.h"
 #include <AIS_ViewCube.hxx>
+#include <AIS_AnimationCamera.hxx>
 #include <Graphic3d_TransformPers.hxx>
 #include <Graphic3d_ZLayerId.hxx>
+#include <TCollection_AsciiString.hxx>
 #include <iostream>
 
 // グローバル変数
@@ -13,7 +15,7 @@ Handle(AIS_InteractiveContext) context;
 void DisplayViewCube()
 {
     Handle(AIS_ViewCube) viewCube = new AIS_ViewCube();
-    viewCube->SetSize(50.0);                         // サイズを小さく設定
+    viewCube->SetSize(50.0);                         // サイズを設定
     viewCube->SetBoxColor(Quantity_NOC_GRAY);        // ボックスの色を設定
     viewCube->SetDrawAxes(Standard_True);            // 軸を描画
     viewCube->SetTransparency(0.5);                  // 透明度を設定
@@ -24,6 +26,11 @@ void DisplayViewCube()
     viewCube->SetTransformPersistence(new Graphic3d_TransformPers(
         Graphic3d_TMF_TriedronPers, Aspect_TOTP_RIGHT_LOWER, offset));
 
+    // アニメーションを有効化
+    Handle(AIS_AnimationCamera) animation = new AIS_AnimationCamera("ViewCubeAnimation", view);
+    viewCube->SetViewAnimation(animation);
+
+    // AIS_ViewCube をコンテキストに追加
     context->Display(viewCube, Standard_True);
 }
 
@@ -37,10 +44,34 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     switch (msg)
     {
     case WM_LBUTTONDOWN:
-        isDragging = true;
-        lastX = LOWORD(lParam);
-        lastY = HIWORD(lParam);
-        view->StartRotation(lastX, lastY);
+    {
+        // マウスクリックで選択を処理
+        POINT point;
+        GetCursorPos(&point);
+        ScreenToClient(hwnd, &point);
+
+        // MoveToでオブジェクトを検出
+        context->MoveTo(point.x, point.y, view, Standard_True);
+
+        // 検出されたオブジェクトを選択
+        if (context->HasDetected())
+        {
+            context->SelectDetected();
+            Handle(AIS_InteractiveObject) detectedObject = context->DetectedInteractive();
+            if (!detectedObject.IsNull() && detectedObject->IsKind(STANDARD_TYPE(AIS_ViewCube)))
+            {
+                // ViewCube のクリックイベントを処理
+                std::cout << "ViewCube clicked!" << std::endl;
+            }
+        }
+        else
+        {
+            isDragging = true;
+            lastX = LOWORD(lParam);
+            lastY = HIWORD(lParam);
+            view->StartRotation(lastX, lastY);
+        }
+    }
         SetCapture(hwnd);
         break;
 
