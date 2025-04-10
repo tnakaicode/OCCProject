@@ -32,11 +32,6 @@
 #include <string>
 #include <windows.h>
 
-// グローバル変数
-Handle(V3d_Viewer) viewer;
-Handle(V3d_View) view;
-Handle(AIS_InteractiveContext) context;
-
 // 設定ファイルのパス
 const std::string CONFIG_FILE = "viewer_config.txt";
 
@@ -71,157 +66,79 @@ void LoadWindowConfig(HWND hwnd)
     }
 }
 
-// 座標系を表示する関数
-void DisplayViewCube()
+// 構造体で `context` と `view` をまとめて管理
+struct ViewerData
 {
-    Handle(AIS_ViewCube) viewCube = new AIS_ViewCube();
-    viewCube->SetSize(50.0);                         // サイズを設定
-    viewCube->SetBoxColor(Quantity_NOC_GRAY);        // ボックスの色を設定
-    viewCube->SetDrawAxes(Standard_True);            // 軸を描画
-    viewCube->SetTransparency(0.5);                  // 透明度を設定
-    viewCube->SetZLayer(Graphic3d_ZLayerId_Topmost); // 最上位レイヤーに設定
-
-    // オフセットを調整して右下に配置
-    Graphic3d_Vec2i offset(100, 100); // ウィンドウの右下からのオフセット（ピクセル単位）
-    viewCube->SetTransformPersistence(new Graphic3d_TransformPers(
-        Graphic3d_TMF_TriedronPers, Aspect_TOTP_RIGHT_LOWER, offset));
-
-    // アニメーションを有効化
-    Handle(AIS_AnimationCamera) animation = new AIS_AnimationCamera("ViewCubeAnimation", view);
-    viewCube->SetViewAnimation(animation);
-
-    // AIS_ViewCube をコンテキストに追加
-    context->Display(viewCube, Standard_True);
-}
+    Handle(AIS_InteractiveContext) context;
+    Handle(V3d_View) view;
+};
 
 // ウィンドウプロシージャ
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    static bool isDragging = false;
-    static bool isPanning = false;
-    static int lastX = 0, lastY = 0;
+    ViewerData *viewerData = reinterpret_cast<ViewerData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
     switch (msg)
     {
     case WM_CREATE:
-        // 設定ファイルからサイズと位置を読み込む
+        // ウィンドウ作成時に設定ファイルからサイズと位置を読み込む
         LoadWindowConfig(hwnd);
         break;
 
     case WM_LBUTTONDOWN:
     {
-        // マウスクリックで選択を処理
-        POINT point;
-        GetCursorPos(&point);
-        ScreenToClient(hwnd, &point);
-
-        // MoveToでオブジェクトを検出
-        context->MoveTo(point.x, point.y, view, Standard_True);
-
-        // 検出されたオブジェクトを選択
-        if (context->HasDetected())
+        if (viewerData)
         {
-            context->SelectDetected();
-            Handle(AIS_InteractiveObject) detectedObject = context->DetectedInteractive();
-            if (!detectedObject.IsNull() && detectedObject->IsKind(STANDARD_TYPE(AIS_ViewCube)))
+            Handle(AIS_InteractiveContext) context = viewerData->context;
+            Handle(V3d_View) view = viewerData->view;
+
+            // 左ボタン押下時の処理
+            POINT point;
+            GetCursorPos(&point);
+            ScreenToClient(hwnd, &point);
+
+            // MoveToでオブジェクトを検出
+            context->MoveTo(point.x, point.y, view, Standard_True);
+
+            // 検出されたオブジェクトを選択
+            if (context->HasDetected())
             {
-                // ViewCube のクリックイベントを処理
-                std::cout << "ViewCube clicked!" << std::endl;
+                context->SelectDetected();
+                Handle(AIS_InteractiveObject) detectedObject = context->DetectedInteractive();
+                if (!detectedObject.IsNull() && detectedObject->IsKind(STANDARD_TYPE(AIS_ViewCube)))
+                {
+                    // ViewCube のクリックイベントを処理
+                    std::cout << "ViewCube clicked!" << std::endl;
+                }
             }
-        }
-        else
-        {
-            isDragging = true;
-            lastX = LOWORD(lParam);
-            lastY = HIWORD(lParam);
-            view->StartRotation(lastX, lastY);
         }
     }
-        SetCapture(hwnd);
-        break;
-
-    case WM_LBUTTONUP:
-        isDragging = false;
-        ReleaseCapture();
-        break;
-
-    case WM_RBUTTONDOWN:
-        isPanning = true;
-        lastX = LOWORD(lParam);
-        lastY = HIWORD(lParam);
-        SetCapture(hwnd);
-        break;
-
-    case WM_RBUTTONUP:
-        isPanning = false;
-        ReleaseCapture();
-        break;
-
-    case WM_MOUSEMOVE:
-        if (isDragging && !view.IsNull())
-        {
-            int x = LOWORD(lParam);
-            int y = HIWORD(lParam);
-            view->Rotation(x, y);
-            lastX = x;
-            lastY = y;
-        }
-        else if (isPanning && !view.IsNull())
-        {
-            int x = LOWORD(lParam);
-            int y = HIWORD(lParam);
-            double dx = static_cast<double>(x - lastX);
-            double dy = static_cast<double>(y - lastY);
-            view->Pan(dx, dy);
-            lastX = x;
-            lastY = y;
-        }
-        break;
-
-    case WM_MOUSEWHEEL:
-        if (!view.IsNull())
-        {
-            int delta = GET_WHEEL_DELTA_WPARAM(wParam);
-            if (delta < 0)
-            {
-                view->SetZoom(0.9);
-            }
-            else
-            {
-                view->SetZoom(1.1);
-            }
-        }
-        break;
-
-    case WM_SIZE:
-        if (!view.IsNull())
-        {
-            RECT rect;
-            GetClientRect(hwnd, &rect);
-            int width = rect.right - rect.left;
-            int height = rect.bottom - rect.top;
-            if (width > 0 && height > 0)
-            {
-                view->SetWindow(view->Window());
-                view->MustBeResized();
-            }
-        }
+        SetCapture(hwnd); // マウスキャプチャを設定
         break;
 
     case WM_DESTROY:
-        // ウィンドウのサイズと位置を保存
-        SaveWindowConfig(hwnd);
-        PostQuitMessage(0);
+        // ウィンドウが破棄されるときの処理
+        SaveWindowConfig(hwnd); // ウィンドウのサイズと位置を保存
+
+        // `ViewerData` を解放
+        delete viewerData;
+        SetWindowLongPtr(hwnd, GWLP_USERDATA, 0);
+
+        PostQuitMessage(0); // アプリケーションを終了
         break;
 
     default:
+        // その他のメッセージはデフォルトの処理を実行
         return DefWindowProc(hwnd, msg, wParam, lParam);
     }
     return 0;
 }
 
-// Viewerを初期化する関数
-void InitializeViewer(const std::string &windowTitle)
+// Viewerの初期化
+void InitializeViewer(const std::string &windowTitle,
+                      Handle(V3d_Viewer) & viewer,
+                      Handle(V3d_View) & view,
+                      Handle(AIS_InteractiveContext) & context)
 {
     HINSTANCE hInstance = GetModuleHandle(nullptr);
     const wchar_t *className = L"OpenCASCADEViewer";
@@ -268,12 +185,54 @@ void InitializeViewer(const std::string &windowTitle)
 
     context = new AIS_InteractiveContext(viewer);
 
-    // 座標系を表示
-    DisplayViewCube();
+    // `context` と `view` をウィンドウに関連付け
+    ViewerData *viewerData = new ViewerData{context, view};
+    SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(viewerData));
 }
 
-// 点群を表示する関数
-void DisplayPointCloud(const Handle(AIS_InteractiveContext) & context, const std::vector<std::array<float, 3>> &points)
+// 座標系を表示
+void DisplayViewCube(const Handle(AIS_InteractiveContext) & context, const Handle(V3d_View) & view)
+{
+    Handle(AIS_ViewCube) viewCube = new AIS_ViewCube();
+    viewCube->SetSize(50.0);
+    viewCube->SetBoxColor(Quantity_NOC_GRAY);
+    viewCube->SetDrawAxes(Standard_True);
+    viewCube->SetTransparency(0.5);
+    viewCube->SetZLayer(Graphic3d_ZLayerId_Topmost);
+
+    Graphic3d_Vec2i offset(100, 100);
+    viewCube->SetTransformPersistence(new Graphic3d_TransformPers(
+        Graphic3d_TMF_TriedronPers, Aspect_TOTP_RIGHT_LOWER, offset));
+
+    Handle(AIS_AnimationCamera) animation = new AIS_AnimationCamera("ViewCubeAnimation", view);
+    viewCube->SetViewAnimation(animation);
+
+    context->Display(viewCube, Standard_True);
+}
+
+// 楕円体を作成して表示
+void DisplayEllipsoid(const Handle(AIS_InteractiveContext) & context,
+                      const float radiusX, const float radiusY, const float radiusZ)
+{
+    gp_Ax2 ellipseAxis(gp_Pnt(0, 0, 0), gp_Dir(0, 0, 1));
+    Handle(Geom_Ellipse) ellipse = new Geom_Ellipse(ellipseAxis, radiusX, radiusY);
+    Handle(Geom_TrimmedCurve) trimmedEllipse = new Geom_TrimmedCurve(ellipse, 0, M_PI * 2);
+    TopoDS_Edge ellipseEdge = BRepBuilderAPI_MakeEdge(trimmedEllipse);
+    TopoDS_Shape ellipsoid = BRepPrimAPI_MakeRevol(ellipseEdge, ellipseAxis.Axis());
+
+    Handle(AIS_Shape) aisEllipsoid = new AIS_Shape(ellipsoid);
+
+    Handle(Prs3d_ShadingAspect) shadingAspect = new Prs3d_ShadingAspect();
+    shadingAspect->SetTransparency(0.7);
+    shadingAspect->SetColor(Quantity_NOC_BLUE1);
+    aisEllipsoid->Attributes()->SetShadingAspect(shadingAspect);
+
+    context->Display(aisEllipsoid, Standard_True);
+}
+
+// 点群を表示
+void DisplayPointCloud(const Handle(AIS_InteractiveContext) & context,
+                       const std::vector<std::array<float, 3>> &points)
 {
     Handle(TColgp_HArray1OfPnt) pointArray = new TColgp_HArray1OfPnt(1, static_cast<Standard_Integer>(points.size()));
     for (Standard_Integer i = 0; i < points.size(); ++i)
@@ -286,28 +245,4 @@ void DisplayPointCloud(const Handle(AIS_InteractiveContext) & context, const std
     aisPointCloud->SetPoints(pointArray);
 
     context->Display(aisPointCloud, Standard_True);
-    view->FitAll();
-}
-
-// 楕円体を作成して表示する関数
-void DisplayEllipsoid(const Handle(AIS_InteractiveContext) & context,
-                      const float radiusX, const float radiusY, const float radiusZ)
-{
-    // 楕円を回転させて楕円体を作成
-    gp_Ax2 ellipseAxis(gp_Pnt(0, 0, 0), gp_Dir(0, 0, 1));
-    Handle(Geom_Ellipse) ellipse = new Geom_Ellipse(ellipseAxis, radiusX, radiusY);
-    Handle(Geom_TrimmedCurve) trimmedEllipse = new Geom_TrimmedCurve(ellipse, 0, M_PI * 2);
-    TopoDS_Edge ellipseEdge = BRepBuilderAPI_MakeEdge(trimmedEllipse);
-    TopoDS_Shape ellipsoid = BRepPrimAPI_MakeRevol(ellipseEdge, ellipseAxis.Axis());
-
-    // 楕円体を表示
-    Handle(AIS_Shape) aisEllipsoid = new AIS_Shape(ellipsoid);
-
-    // 楕円体の透過率と色を設定
-    Handle(Prs3d_ShadingAspect) shadingAspect = new Prs3d_ShadingAspect();
-    shadingAspect->SetTransparency(0.7);         // 透過率（0.0 = 不透明、1.0 = 完全透明）
-    shadingAspect->SetColor(Quantity_NOC_BLUE1); // 楕円体の色
-    aisEllipsoid->Attributes()->SetShadingAspect(shadingAspect);
-
-    context->Display(aisEllipsoid, Standard_True);
 }

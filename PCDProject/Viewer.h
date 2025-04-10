@@ -14,16 +14,20 @@
 #include <vector>
 #include <array>
 
-// グローバル変数
-extern Handle(V3d_Viewer) viewer;
-extern Handle(V3d_View) view;
-extern Handle(AIS_InteractiveContext) context;
+// ウィンドウのサイズと位置を保存
+void SaveWindowConfig(HWND hwnd);
+
+// ウィンドウのサイズと位置を読み込み
+void LoadWindowConfig(HWND hwnd);
 
 // Viewerの初期化
-void InitializeViewer(const std::string &windowTitle);
+void InitializeViewer(const std::string &windowTitle,
+                      Handle(V3d_Viewer) & viewer,
+                      Handle(V3d_View) & view,
+                      Handle(AIS_InteractiveContext) & context);
 
 // 座標系を表示
-void DisplayViewCube();
+void DisplayViewCube(const Handle(AIS_InteractiveContext) & context, const Handle(V3d_View) & view);
 
 // 楕円体を作成して表示
 void DisplayEllipsoid(const Handle(AIS_InteractiveContext) & context,
