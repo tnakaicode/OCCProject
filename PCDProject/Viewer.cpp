@@ -1,9 +1,32 @@
 #include "Viewer.h"
 #include <AIS_ViewCube.hxx>
 #include <AIS_AnimationCamera.hxx>
+#include <AIS_InteractiveContext.hxx>
+#include <AIS_Shape.hxx>
+#include <AIS_PointCloud.hxx>
+#include <Graphic3d_AspectFillArea3d.hxx>
 #include <Graphic3d_TransformPers.hxx>
 #include <Graphic3d_ZLayerId.hxx>
+#include <Aspect_DisplayConnection.hxx>
+#include <OpenGl_GraphicDriver.hxx>
+#include <V3d_Viewer.hxx>
+#include <V3d_View.hxx>
+#include <WNT_Window.hxx>
 #include <TCollection_AsciiString.hxx>
+#include <gp_Pnt.hxx>
+#include <gp_Ax2.hxx>
+#include <gp_Elips.hxx>
+#include <BRepTools.hxx>
+#include <BRepPrimAPI_MakeBox.hxx>
+#include <BRepPrimAPI_MakeRevol.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
+#include <Geom_Ellipse.hxx>
+#include <Geom_TrimmedCurve.hxx>
+#include <STEPControl_Writer.hxx>
+#include <Quantity_NameOfColor.hxx>
+#include <OSD_Environment.hxx>
+#include <Prs3d_ShadingAspect.hxx>
+#include <Quantity_Color.hxx>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -250,7 +273,7 @@ void InitializeViewer(const std::string &windowTitle)
 }
 
 // 点群を表示する関数
-void DisplayPointCloud(const std::vector<std::array<float, 3>> &points)
+void DisplayPointCloud(const Handle(AIS_InteractiveContext) & context, const std::vector<std::array<float, 3>> &points)
 {
     Handle(TColgp_HArray1OfPnt) pointArray = new TColgp_HArray1OfPnt(1, static_cast<Standard_Integer>(points.size()));
     for (Standard_Integer i = 0; i < points.size(); ++i)
@@ -264,4 +287,27 @@ void DisplayPointCloud(const std::vector<std::array<float, 3>> &points)
 
     context->Display(aisPointCloud, Standard_True);
     view->FitAll();
+}
+
+// 楕円体を作成して表示する関数
+void DisplayEllipsoid(const Handle(AIS_InteractiveContext) & context,
+                      const float radiusX, const float radiusY, const float radiusZ)
+{
+    // 楕円を回転させて楕円体を作成
+    gp_Ax2 ellipseAxis(gp_Pnt(0, 0, 0), gp_Dir(0, 0, 1));
+    Handle(Geom_Ellipse) ellipse = new Geom_Ellipse(ellipseAxis, radiusX, radiusY);
+    Handle(Geom_TrimmedCurve) trimmedEllipse = new Geom_TrimmedCurve(ellipse, 0, M_PI * 2);
+    TopoDS_Edge ellipseEdge = BRepBuilderAPI_MakeEdge(trimmedEllipse);
+    TopoDS_Shape ellipsoid = BRepPrimAPI_MakeRevol(ellipseEdge, ellipseAxis.Axis());
+
+    // 楕円体を表示
+    Handle(AIS_Shape) aisEllipsoid = new AIS_Shape(ellipsoid);
+
+    // 楕円体の透過率と色を設定
+    Handle(Prs3d_ShadingAspect) shadingAspect = new Prs3d_ShadingAspect();
+    shadingAspect->SetTransparency(0.7);         // 透過率（0.0 = 不透明、1.0 = 完全透明）
+    shadingAspect->SetColor(Quantity_NOC_BLUE1); // 楕円体の色
+    aisEllipsoid->Attributes()->SetShadingAspect(shadingAspect);
+
+    context->Display(aisEllipsoid, Standard_True);
 }

@@ -19,9 +19,20 @@ extern Handle(V3d_Viewer) viewer;
 extern Handle(V3d_View) view;
 extern Handle(AIS_InteractiveContext) context;
 
-// 関数宣言
+// Viewerの初期化
 void InitializeViewer(const std::string &windowTitle);
-void DisplayPointCloud(const std::vector<std::array<float, 3>> &points);
+
+// 座標系を表示
+void DisplayViewCube();
+
+// 楕円体を作成して表示
+void DisplayEllipsoid(const Handle(AIS_InteractiveContext) & context,
+                      const float radiusX, const float radiusY, const float radiusZ);
+
+// 点群を表示
+void DisplayPointCloud(const Handle(AIS_InteractiveContext) & context,
+                       const std::vector<std::array<float, 3>> &points);
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #endif // VIEWER_H
