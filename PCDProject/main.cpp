@@ -9,9 +9,15 @@
 #include <AIS_Shape.hxx>
 #include <AIS_PointCloud.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
+#include <BRepPrimAPI_MakeRevol.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
+#include <Geom_Ellipse.hxx>
+#include <Geom_TrimmedCurve.hxx>
 #include <BRepTools.hxx>
 #include <STEPControl_Writer.hxx>
 #include <gp_Pnt.hxx>
+#include <gp_Ax2.hxx>
+#include <gp_Elips.hxx>
 #include <Quantity_NameOfColor.hxx>
 #include <OSD_Environment.hxx>
 #include <Graphic3d_AspectFillArea3d.hxx>
@@ -46,6 +52,24 @@ int main()
 
     // Viewerを初期化
     InitializeViewer("Point Cloud Viewer");
+
+    // 楕円を回転させて楕円体を作成
+    gp_Ax2 ellipseAxis(gp_Pnt(0, 0, 0), gp_Dir(0, 0, 1));
+    Handle(Geom_Ellipse) ellipse = new Geom_Ellipse(ellipseAxis, radiusX, radiusY);
+    Handle(Geom_TrimmedCurve) trimmedEllipse = new Geom_TrimmedCurve(ellipse, 0, M_PI * 2);
+    TopoDS_Edge ellipseEdge = BRepBuilderAPI_MakeEdge(trimmedEllipse);
+    TopoDS_Shape ellipsoid = BRepPrimAPI_MakeRevol(ellipseEdge, ellipseAxis.Axis());
+
+    // 楕円体を表示
+    Handle(AIS_Shape) aisEllipsoid = new AIS_Shape(ellipsoid);
+
+    // 楕円体の透過率と色を設定
+    Handle(Prs3d_ShadingAspect) shadingAspect = new Prs3d_ShadingAspect();
+    shadingAspect->SetTransparency(0.7);         // 透過率（0.0 = 不透明、1.0 = 完全透明）
+    shadingAspect->SetColor(Quantity_NOC_BLUE1); // 楕円体の色
+    aisEllipsoid->Attributes()->SetShadingAspect(shadingAspect);
+
+    context->Display(aisEllipsoid, Standard_True);
 
     // 点群を表示
     DisplayPointCloud(ellipsePoints);
