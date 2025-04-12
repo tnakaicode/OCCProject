@@ -54,8 +54,16 @@ int main()
     // 楕円体を表示
     DisplayEllipsoid(context, radiusX, radiusY, radiusZ);
 
-    // 点群を表示
-    DisplayPointCloud(context, ellipsePoints);
+    // 点群を表示し、AISオブジェクトを取得
+    Handle(AIS_PointCloud) originalPointCloud = DisplayPointCloud(context, ellipsePoints);
+
+    // 別の座標変換を適用して点群を移動
+    gp_Trsf secondTransform;
+    secondTransform.SetTranslation(gp_Vec(5.0, 0.0, 0.0)); // X方向に5.0移動
+
+    // originalPointCloudに座標変換を適用
+    originalPointCloud->SetLocalTransformation(secondTransform);
+    //context->Display(originalPointCloud, Standard_True);
 
     // 楕円体を覆う長方形の頂点を計算
     std::vector<gp_Pnt> boundingBoxVertices = {

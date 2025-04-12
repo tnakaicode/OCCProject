@@ -411,9 +411,9 @@ void DisplayEllipsoid(const Handle(AIS_InteractiveContext) & context,
     context->Display(aisEllipsoid, Standard_True);
 }
 
-// 点群を表示
-void DisplayPointCloud(const Handle(AIS_InteractiveContext) &context,
-                       const std::vector<gp_Pnt> &points) // 修正: std::vector<gp_Pnt> を受け取る
+// 点群を表示し、AIS_PointCloudオブジェクトを返す
+Handle(AIS_PointCloud) DisplayPointCloud(const Handle(AIS_InteractiveContext) & context,
+                                         const std::vector<gp_Pnt> &points) // 修正: std::vector<gp_Pnt> を受け取る
 {
     Handle(TColgp_HArray1OfPnt) pointArray = new TColgp_HArray1OfPnt(1, static_cast<Standard_Integer>(points.size()));
     for (Standard_Integer i = 0; i < points.size(); ++i)
@@ -425,10 +425,11 @@ void DisplayPointCloud(const Handle(AIS_InteractiveContext) &context,
     aisPointCloud->SetPoints(pointArray);
 
     context->Display(aisPointCloud, Standard_True);
+    return aisPointCloud; // AIS_PointCloudオブジェクトを返す
 }
 
 // 単一の点を表示
-void DisplayPoint(const Handle(AIS_InteractiveContext) &context, const gp_Pnt &point) // 修正: gp_Pnt を受け取る
+void DisplayPoint(const Handle(AIS_InteractiveContext) & context, const gp_Pnt &point) // 修正: gp_Pnt を受け取る
 {
     // 点を表す Prs3d_Point を作成
     Handle(Geom_CartesianPoint) geomPoint = new Geom_CartesianPoint(point);
