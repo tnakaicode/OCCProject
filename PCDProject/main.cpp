@@ -5,6 +5,11 @@
 #include <cmath>
 #include <array>
 #include "Viewer.h"
+#include <gp_Ax3.hxx>
+#include <gp_Trsf.hxx>
+#include <gp_Pnt.hxx>
+#include <gp_Vec.hxx>
+#include <gp_Quaternion.hxx>
 
 int main()
 {
@@ -17,8 +22,18 @@ int main()
 
     std::cout << "Starting Point Cloud Processing..." << std::endl;
 
+    // 新しい座標系を定義（例: 平行移動 + 回転）
+    gp_Pnt origin(1.0, 2.0, 0.5); // 新しい座標系の原点
+    gp_Dir zDir(0.0, 0.0, 1.0);   // Z軸方向
+    gp_Dir xDir(1.0, 0.0, 0.0);   // X軸方向
+    gp_Ax3 newAxis(origin, zDir, xDir);
+
+    // 座標変換行列を取得
+    gp_Trsf transform;
+    transform.SetTransformation(newAxis);
+
     // 楕円の点群データを生成
-    std::vector<std::array<float, 3>> ellipsePoints;
+    std::vector<gp_Pnt> ellipsePoints;
     const int numPoints = 10'000'000; // 点の数
     const float radiusX = 2.0f;       // 長軸
     const float radiusY = 1.0f;       // 短軸
@@ -31,7 +46,9 @@ int main()
         float x = radiusX * sin(phi) * cos(theta);
         float y = radiusY * sin(phi) * sin(theta);
         float z = radiusZ * cos(phi);
-        ellipsePoints.push_back({x, y, z});
+        gp_Pnt point(x, y, z);
+        point.Transform(transform);     // 座標変換を適用
+        ellipsePoints.push_back(point); // 座標変換を適用
     }
 
     // 楕円体を表示
@@ -41,21 +58,22 @@ int main()
     DisplayPointCloud(context, ellipsePoints);
 
     // 楕円体を覆う長方形の頂点を計算
-    std::vector<std::array<float, 3>> boundingBoxVertices = {
-        {-radiusX, -radiusY, -radiusZ}, // 頂点1
-        {radiusX, -radiusY, -radiusZ},  // 頂点2
-        {radiusX, radiusY, -radiusZ},   // 頂点3
-        {-radiusX, radiusY, -radiusZ},  // 頂点4
-        {-radiusX, -radiusY, radiusZ},  // 頂点5
-        {radiusX, -radiusY, radiusZ},   // 頂点6
-        {radiusX, radiusY, radiusZ},    // 頂点7
-        {-radiusX, radiusY, radiusZ}    // 頂点8
+    std::vector<gp_Pnt> boundingBoxVertices = {
+        gp_Pnt(-radiusX, -radiusY, -radiusZ), // 頂点1
+        gp_Pnt(radiusX, -radiusY, -radiusZ),  // 頂点2
+        gp_Pnt(radiusX, radiusY, -radiusZ),   // 頂点3
+        gp_Pnt(-radiusX, radiusY, -radiusZ),  // 頂点4
+        gp_Pnt(-radiusX, -radiusY, radiusZ),  // 頂点5
+        gp_Pnt(radiusX, -radiusY, radiusZ),   // 頂点6
+        gp_Pnt(radiusX, radiusY, radiusZ),    // 頂点7
+        gp_Pnt(-radiusX, radiusY, radiusZ)    // 頂点8
     };
 
-    // 頂点を描画
-    for (const auto &vertex : boundingBoxVertices)
+    // 変換を適用した頂点を描画
+    for (auto &vertex : boundingBoxVertices)
     {
-        DisplayPoint(context, vertex[0], vertex[1], vertex[2]);
+        vertex.Transform(transform); // 座標変換を適用
+        DisplayPoint(context, vertex);
     }
     view->FitAll(); // 全体を表示
 
