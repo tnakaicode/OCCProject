@@ -41,7 +41,7 @@ int main()
 
     for (int i = 0; i < numPoints; ++i)
     {
-        float theta = static_cast<float>(rand()) / RAND_MAX * 2.0f * M_PI;     // 0 to 2π
+        float theta = static_cast<float>(rand()) / RAND_MAX * 2.0f * static_cast<float>(M_PI); // 0 to 2π
         float phi = acos(2.0f * static_cast<float>(rand()) / RAND_MAX - 1.0f); // 0 to π
         float x = radiusX * sin(phi) * cos(theta);
         float y = radiusY * sin(phi) * sin(theta);
