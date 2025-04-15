@@ -123,8 +123,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Viewer.h" />
+    <ClInclude Include="VersionInfo.h" /> <!-- 生成されたヘッダーをプロジェクトに含める -->
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+
+  <!-- カスタムターゲットを追加 -->
+  <Target Name="GenerateVersionHeader" BeforeTargets="ClCompile">
+    <!-- version.txt を読み込んで VersionLines に格納 -->
+    <ReadLinesFromFile File="version.txt">
+      <Output TaskParameter="Lines" ItemName="VersionLines" />
+    </ReadLinesFromFile>
+
+    <!-- VersionInfo.h を生成 -->
+    <ItemGroup>
+      <GeneratedHeaderLines Include="// Auto-generated file. Do not edit manually." />
+      <GeneratedHeaderLines Include="#pragma once" />
+      <GeneratedHeaderLines Include="const char* APP_VERSION = &quot;Version %(VersionLines.Identity)&quot;;" />
+    </ItemGroup>
+    <WriteLinesToFile File="VersionInfo.h" Overwrite="true" Lines="@(GeneratedHeaderLines)" />
+  </Target>
 </Project>

@@ -37,6 +37,13 @@
 // 設定ファイルのパス
 const std::string CONFIG_FILE = "viewer_config.txt";
 
+// アプリのバージョン情報を定義
+#ifdef _DEBUG
+const std::string APP_VERSION = "Version 1.0.0 - Debug";
+#else
+const std::string APP_VERSION = "Version 1.0.0 - Release";
+#endif
+
 // ウィンドウのサイズと位置を保存
 void SaveWindowConfig(HWND hwnd)
 {
@@ -173,9 +180,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     switch (msg)
     {
     case WM_CREATE:
+    {
         // ウィンドウ作成時に設定ファイルからサイズと位置を読み込む
         LoadWindowConfig(hwnd);
-        break;
+
+        // ウィンドウタイトルにバージョン情報を設定
+        std::string windowTitle = "Point Cloud Viewer - " + APP_VERSION;
+        SetWindowTextA(hwnd, windowTitle.c_str());
+    }
+    break;
 
     case WM_LBUTTONDOWN:
     {
