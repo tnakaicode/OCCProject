@@ -131,29 +131,30 @@ int main()
     flatKnots->SetValue(6, 1.0);
 
     // 制御点を定義
-    Handle(TColgp_HArray1OfPnt2d) poles = new TColgp_HArray1OfPnt2d(1, 4);
-    poles->SetValue(1, gp_Pnt2d(0.0, 0.0));
-    poles->SetValue(2, gp_Pnt2d(1.0, 2.0));
-    poles->SetValue(3, gp_Pnt2d(2.0, 0.0));
-    poles->SetValue(4, gp_Pnt2d(3.0, 1.0));
+    TColgp_Array1OfPnt poles(1, 4);
+    poles.SetValue(1, gp_Pnt(0.0, 0.0, 0.0));
+    poles.SetValue(2, gp_Pnt(1.0, 2.0, 0.0));
+    poles.SetValue(3, gp_Pnt(2.0, 0.0, 0.0));
+    poles.SetValue(4, gp_Pnt(3.0, 1.0, 0.0));
 
     // ノットベクトルを定義
-    TColStd_Array1OfReal knots(1, 6); // ノットベクトルのサイズを指定
+    TColStd_Array1OfReal knots(1, 6);
     knots.SetValue(1, 0.0);
-    knots.SetValue(2, 0.1);
+    knots.SetValue(2, 0.01);
     knots.SetValue(3, 0.5);
     knots.SetValue(4, 0.75);
-    knots.SetValue(5, 0.9);
+    knots.SetValue(5, 0.99);
     knots.SetValue(6, 1.0);
 
     // マルチシティを定義
     TColStd_Array1OfInteger multiplicities(1, 6); // ノットベクトルのサイズに合わせる
-    multiplicities.SetValue(1, 3);                // 最初のノットのマルチシティ（次数に一致）
+    multiplicities.SetValue(1, 2);                // 最初のノットのマルチシティ（次数に一致）
     multiplicities.SetValue(2, 1);                // 中間のノット
     multiplicities.SetValue(3, 1);                // 中間のノット
     multiplicities.SetValue(4, 1);                // 中間のノット
     multiplicities.SetValue(5, 1);                // 中間のノット
-    multiplicities.SetValue(6, 3);                // 最後のノットのマルチシティ（次数に一致）
+    multiplicities.SetValue(6, 2);                // 最後のノットのマルチシティ（次数に一致）
+
 
     // バテン法則を定義
     Standard_Real Heigth = 1.0;  // 中央点の高さ
@@ -174,51 +175,54 @@ int main()
     Standard_Real Curvature2 = 0.0;
 
     // FairCurve_EnergyOfMVC を初期化
-    FairCurve_EnergyOfMVC energyOfMVC(
-        BSplOrder,
-        flatKnots,
-        poles,
-        ContrOrder1,
-        ContrOrder2,
-        battenLaw,
-        PhysicalRatio,
-        LengthSliding,
-        FreeSliding,
-        Angle1,
-        Angle2,
-        Curvature1,
-        Curvature2);
+    //FairCurve_EnergyOfMVC energyOfMVC(
+    //    BSplOrder,
+    //    flatKnots,
+    //    poles,
+    //    ContrOrder1,
+    //    ContrOrder2,
+    //    battenLaw,
+    //    PhysicalRatio,
+    //    LengthSliding,
+    //    FreeSliding,
+    //    Angle1,
+    //    Angle2,
+    //    Curvature1,
+    //    Curvature2);
 
     // エネルギーのスライディング長さを取得
-    Standard_Real lengthSliding = energyOfMVC.LengthSliding();
-    std::cout << "Length Sliding: " << lengthSliding << std::endl;
+    //Standard_Real lengthSliding = energyOfMVC.LengthSliding();
+    //std::cout << "Length Sliding: " << lengthSliding << std::endl;
 
     // 状態を取得
-    FairCurve_AnalysisCode status = energyOfMVC.Status();
-    std::cout << "Status: " << static_cast<int>(status) << std::endl;
+    //FairCurve_AnalysisCode status = energyOfMVC.Status();
+    //std::cout << "Status: " << static_cast<int>(status) << std::endl;
 
     // 変数を計算
-    math_Vector variables(1, poles->Length());
-    if (energyOfMVC.Variable(variables))
-    {
-        std::cout << "Variables: ";
-        for (Standard_Integer i = 1; i <= variables.Length(); ++i)
-        {
-            std::cout << variables(i) << " ";
-        }
-        std::cout << std::endl;
-    }
-    else
-    {
-        std::cerr << "Failed to compute variables." << std::endl;
-    }
+    //math_Vector variables(1, poles->Length());
+    //if (energyOfMVC.Variable(variables))
+    //{
+    //    std::cout << "Variables: ";
+    //    for (Standard_Integer i = 1; i <= variables.Length(); ++i)
+    //    {
+    //        std::cout << variables(i) << " ";
+    //    }
+    //    std::cout << std::endl;
+    //}
+    //else
+    //{
+    //    std::cerr << "Failed to compute variables." << std::endl;
+    //}
+
+    // Handle(TColgp_Array1OfPnt) を参照
+    //const TColgp_Array1OfPnt &controlPoints = *(poles);
 
     // Bスプライン曲線を作成
-    TColgp_Array1OfPnt controlPoints(1, poles->Length());
-    for (Standard_Integer i = 1; i <= poles->Length(); ++i)
-    {
-        controlPoints.SetValue(i, gp_Pnt(poles->Value(i).X(), poles->Value(i).Y(), 0.0));
-    }
+    //TColgp_Array1OfPnt controlPoints(1, poles->Length());
+    //for (Standard_Integer i = 1; i <= poles->Length(); ++i)
+    //{
+    //    controlPoints.SetValue(i, poles->Value(i)); // 制御点を設定
+    //}
 
     std::cout << "Starting Point Cloud Processing..." << std::endl;
 
@@ -287,7 +291,7 @@ int main()
     std::cout << "Point Cloud Processing Completed." << std::endl;
 
     // Bスプライン曲線を表示
-    DisplayBSplineCurve(context, controlPoints, knots, multiplicities, 3);
+    DisplayBSplineCurve(context, poles, knots, multiplicities, 3);
 
     std::cout << "B-Spline Curve created and displayed." << std::endl;
 
