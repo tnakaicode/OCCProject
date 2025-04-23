@@ -38,6 +38,18 @@ public:
         return Standard_True;
     }
 
+    //! 関数値と勾配を計算
+    virtual Standard_Boolean Values(const math_Vector &X, Standard_Real &F, math_Vector &G) override
+    {
+        // 関数値
+        Value(X, F);
+
+        // 勾配
+        Gradient(X, G);
+
+        return Standard_True;
+    }
+
     //! ヘッセ行列を計算
     virtual Standard_Boolean Values(const math_Vector &X, Standard_Real &F, math_Vector &G, math_Matrix &H) override
     {
@@ -55,7 +67,14 @@ public:
 
         return Standard_True;
     }
+
+    //! 次元数を返す
+    virtual Standard_Integer NbVariables() const override
+    {
+        return 2; // 2次元 (x, y)
+    }
 };
+
 int main()
 {
     // 最適化対象の関数を作成
@@ -70,7 +89,7 @@ int main()
     FairCurve_Newton optimizer(function, 1.0e-7, 1.0e-7, 40, 1.0e-6, Standard_True);
 
     // 最適化を実行
-    optimizer.Perform(startPoint);
+    optimizer.Perform(function, startPoint);
 
     // 結果を取得
     if (optimizer.IsDone())
