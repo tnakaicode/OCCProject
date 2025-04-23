@@ -158,7 +158,7 @@ int main()
     Standard_Integer ContrOrder2 = 2; // 2つ目の制約次数
     Standard_Real PhysicalRatio = 1.0;
     Standard_Real LengthSliding = 0.5;
-    Standard_Boolean FreeSliding = Standard_True;
+    Standard_Boolean FreeSliding = Standard_False; // スライディングを固定
     Standard_Real Angle1 = 0.0;
     Standard_Real Angle2 = 0.0;
     Standard_Real Curvature1 = 0.0;
