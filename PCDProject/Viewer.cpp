@@ -23,12 +23,16 @@
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <Geom_Ellipse.hxx>
 #include <Geom_TrimmedCurve.hxx>
+#include <Geom_CartesianPoint.hxx>
+#include <Geom_BSplineCurve.hxx>
 #include <STEPControl_Writer.hxx>
+#include <Prs3d_ShadingAspect.hxx>
 #include <Quantity_NameOfColor.hxx>
 #include <OSD_Environment.hxx>
-#include <Prs3d_ShadingAspect.hxx>
 #include <Quantity_Color.hxx>
-#include <Geom_CartesianPoint.hxx>
+#include <TopoDS.hxx>
+#include <TColStd_Array1OfInteger.hxx>
+#include <TColgp_Array1OfPnt.hxx>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -450,4 +454,32 @@ void DisplayPoint(const Handle(AIS_InteractiveContext) & context, const gp_Pnt &
 
     // 点をコンテキストに追加
     context->Display(aisPoint, Standard_True);
+}
+
+// Bスプライン曲線を表示
+void DisplayBSplineCurve(const Handle(AIS_InteractiveContext) & context,
+                         const TColgp_Array1OfPnt &controlPoints,
+                         const TColStd_Array1OfReal &knots,
+                         const TColStd_Array1OfInteger &multiplicities,
+                         Standard_Integer degree)
+{
+    try
+    {
+        // Bスプライン曲線を作成
+        Handle(Geom_BSplineCurve) bsplineCurve = new Geom_BSplineCurve(controlPoints, knots, multiplicities, degree);
+
+        // 曲線をエッジとして作成
+        BRepBuilderAPI_MakeEdge edgeMaker(bsplineCurve);
+        TopoDS_Edge edge = edgeMaker.Edge();
+
+        // AIS_Shape を作成して表示
+        Handle(AIS_Shape) aisCurve = new AIS_Shape(edge);
+        context->Display(aisCurve, Standard_True);
+
+        std::cout << "B-Spline curve displayed successfully." << std::endl;
+    }
+    catch (Standard_Failure &e)
+    {
+        std::cerr << "Error displaying B-Spline curve: " << e.GetMessageString() << std::endl;
+    }
 }

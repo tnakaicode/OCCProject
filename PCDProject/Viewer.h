@@ -10,6 +10,9 @@
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_PointCloud.hxx>
 #include <TColgp_HArray1OfPnt.hxx>
+#include <TColgp_Array1OfPnt.hxx>
+#include <TColStd_Array1OfReal.hxx>
+#include <TColStd_Array1OfInteger.hxx>
 #include <gp_Pnt.hxx>
 #include <vector>
 #include <array>
@@ -38,6 +41,13 @@ Handle(AIS_PointCloud) DisplayPointCloud(const Handle(AIS_InteractiveContext) & 
                                          const std::vector<gp_Pnt> &points);
 
 void DisplayPoint(const Handle(AIS_InteractiveContext) & context, const gp_Pnt &point);
+
+// Bスプライン曲線を表示
+void DisplayBSplineCurve(const Handle(AIS_InteractiveContext) & context,
+                         const TColgp_Array1OfPnt &controlPoints,
+                         const TColStd_Array1OfReal &knots,
+                         const TColStd_Array1OfInteger &multiplicities,
+                         Standard_Integer degree);
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
