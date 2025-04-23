@@ -10,9 +10,80 @@
 #include <gp_Pnt.hxx>
 #include <gp_Vec.hxx>
 #include <gp_Quaternion.hxx>
+#include <FEmtool_Curve.hxx>
+#include <FairCurve_Newton.hxx>
+#include <math_MultipleVarFunctionWithHessian.hxx>
 
+// 最適化対象の関数を定義
+class MyFunction : public math_MultipleVarFunctionWithHessian
+{
+public:
+    //! コンストラクタ
+    MyFunction() {}
+
+    //! 関数値を計算
+    virtual Standard_Boolean Value(const math_Vector &X, Standard_Real &F) override
+    {
+        // 例: f(x, y) = (x - 1)^2 + (y - 2)^2
+        F = pow(X(1) - 1.0, 2) + pow(X(2) - 2.0, 2);
+        return Standard_True;
+    }
+
+    //! 勾配を計算
+    virtual Standard_Boolean Gradient(const math_Vector &X, math_Vector &G) override
+    {
+        // 例: ∇f(x, y) = [2(x - 1), 2(y - 2)]
+        G(1) = 2.0 * (X(1) - 1.0);
+        G(2) = 2.0 * (X(2) - 2.0);
+        return Standard_True;
+    }
+
+    //! ヘッセ行列を計算
+    virtual Standard_Boolean Values(const math_Vector &X, Standard_Real &F, math_Vector &G, math_Matrix &H) override
+    {
+        // 関数値
+        Value(X, F);
+
+        // 勾配
+        Gradient(X, G);
+
+        // ヘッセ行列 (2x2 の定数行列)
+        H(1, 1) = 2.0;
+        H(1, 2) = 0.0;
+        H(2, 1) = 0.0;
+        H(2, 2) = 2.0;
+
+        return Standard_True;
+    }
+};
 int main()
 {
+    // 最適化対象の関数を作成
+    MyFunction function;
+
+    // 初期値を設定 (例: x = 0, y = 0)
+    math_Vector startPoint(1, 2); // 2次元ベクトル
+    startPoint(1) = 0.0;          // x
+    startPoint(2) = 0.0;          // y
+
+    // FairCurve_Newton を初期化
+    FairCurve_Newton optimizer(function, 1.0e-7, 1.0e-7, 40, 1.0e-6, Standard_True);
+
+    // 最適化を実行
+    optimizer.Perform(startPoint);
+
+    // 結果を取得
+    if (optimizer.IsDone())
+    {
+        const math_Vector &solution = optimizer.Location();
+        std::cout << "Optimization completed successfully!" << std::endl;
+        std::cout << "Optimal solution: x = " << solution(1) << ", y = " << solution(2) << std::endl;
+    }
+    else
+    {
+        std::cout << "Optimization failed." << std::endl;
+    }
+
     // Viewerを初期化
     Handle(V3d_Viewer) viewer;
     Handle(V3d_View) view;
@@ -42,7 +113,7 @@ int main()
     for (int i = 0; i < numPoints; ++i)
     {
         float theta = static_cast<float>(rand()) / RAND_MAX * 2.0f * static_cast<float>(M_PI); // 0 to 2π
-        float phi = acos(2.0f * static_cast<float>(rand()) / RAND_MAX - 1.0f); // 0 to π
+        float phi = acos(2.0f * static_cast<float>(rand()) / RAND_MAX - 1.0f);                 // 0 to π
         float x = radiusX * sin(phi) * cos(theta);
         float y = radiusY * sin(phi) * sin(theta);
         float z = radiusZ * cos(phi);
@@ -63,7 +134,7 @@ int main()
 
     // originalPointCloudに座標変換を適用
     originalPointCloud->SetLocalTransformation(secondTransform);
-    //context->Display(originalPointCloud, Standard_True);
+    // context->Display(originalPointCloud, Standard_True);
 
     // 楕円体を覆う長方形の頂点を計算
     std::vector<gp_Pnt> boundingBoxVertices = {
