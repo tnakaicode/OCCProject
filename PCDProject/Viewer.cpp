@@ -461,7 +461,8 @@ void DisplayBSplineCurve(const Handle(AIS_InteractiveContext) & context,
                          const TColgp_Array1OfPnt &controlPoints,
                          const TColStd_Array1OfReal &knots,
                          const TColStd_Array1OfInteger &multiplicities,
-                         Standard_Integer degree)
+                         Standard_Integer degree,
+                         const Quantity_Color *curveColor)
 {
     try
     {
@@ -475,6 +476,7 @@ void DisplayBSplineCurve(const Handle(AIS_InteractiveContext) & context,
         // AIS_Shape を作成して表示
         Handle(AIS_Shape) aisCurve = new AIS_Shape(edge);
         context->Display(aisCurve, Standard_True);
+        context->SetColor(aisCurve, *curveColor, AIS_Shaded);
 
         std::cout << "B-Spline curve displayed successfully." << std::endl;
     }

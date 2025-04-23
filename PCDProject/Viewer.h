@@ -14,6 +14,7 @@
 #include <TColStd_Array1OfReal.hxx>
 #include <TColStd_Array1OfInteger.hxx>
 #include <gp_Pnt.hxx>
+#include <Quantity_Color.hxx>
 #include <vector>
 #include <array>
 
@@ -47,7 +48,8 @@ void DisplayBSplineCurve(const Handle(AIS_InteractiveContext) & context,
                          const TColgp_Array1OfPnt &controlPoints,
                          const TColStd_Array1OfReal &knots,
                          const TColStd_Array1OfInteger &multiplicities,
-                         Standard_Integer degree);
+                         Standard_Integer degree,
+                         const Quantity_Color *curveColor);
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
