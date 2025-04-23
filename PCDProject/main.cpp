@@ -138,20 +138,22 @@ int main()
     poles->SetValue(4, gp_Pnt2d(3.0, 1.0));
 
     // ノットベクトルを定義
-    TColStd_Array1OfReal knots(1, 6);
+    TColStd_Array1OfReal knots(1, 6); // ノットベクトルのサイズを指定
     knots.SetValue(1, 0.0);
-    knots.SetValue(2, 0.0);
+    knots.SetValue(2, 0.1);
     knots.SetValue(3, 0.5);
-    knots.SetValue(4, 1.0);
-    knots.SetValue(5, 1.0);
+    knots.SetValue(4, 0.75);
+    knots.SetValue(5, 0.9);
     knots.SetValue(6, 1.0);
 
     // マルチシティを定義
-    TColStd_Array1OfInteger multiplicities(1, 4);
-    multiplicities.SetValue(1, 2);
-    multiplicities.SetValue(2, 1);
-    multiplicities.SetValue(3, 1);
-    multiplicities.SetValue(4, 2);
+    TColStd_Array1OfInteger multiplicities(1, 6); // ノットベクトルのサイズに合わせる
+    multiplicities.SetValue(1, 3);                // 最初のノットのマルチシティ（次数に一致）
+    multiplicities.SetValue(2, 1);                // 中間のノット
+    multiplicities.SetValue(3, 1);                // 中間のノット
+    multiplicities.SetValue(4, 1);                // 中間のノット
+    multiplicities.SetValue(5, 1);                // 中間のノット
+    multiplicities.SetValue(6, 3);                // 最後のノットのマルチシティ（次数に一致）
 
     // バテン法則を定義
     Standard_Real Heigth = 1.0;  // 中央点の高さ
@@ -250,17 +252,17 @@ int main()
     }
 
     // 楕円体を表示
-    //DisplayEllipsoid(context, radiusX, radiusY, radiusZ);
+    // DisplayEllipsoid(context, radiusX, radiusY, radiusZ);
 
     // 点群を表示し、AISオブジェクトを取得
-    //Handle(AIS_PointCloud) originalPointCloud = DisplayPointCloud(context, ellipsePoints);
+    // Handle(AIS_PointCloud) originalPointCloud = DisplayPointCloud(context, ellipsePoints);
 
     // 別の座標変換を適用して点群を移動
     gp_Trsf secondTransform;
     secondTransform.SetTranslation(gp_Vec(5.0, 0.0, 0.0)); // X方向に5.0移動
 
     // originalPointCloudに座標変換を適用
-    //originalPointCloud->SetLocalTransformation(secondTransform);
+    // originalPointCloud->SetLocalTransformation(secondTransform);
     // context->Display(originalPointCloud, Standard_True);
 
     // 楕円体を覆う長方形の頂点を計算
@@ -279,7 +281,7 @@ int main()
     for (auto &vertex : boundingBoxVertices)
     {
         vertex.Transform(transform); // 座標変換を適用
-        //DisplayPoint(context, vertex);
+        // DisplayPoint(context, vertex);
     }
 
     std::cout << "Point Cloud Processing Completed." << std::endl;
