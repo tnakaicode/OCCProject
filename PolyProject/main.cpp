@@ -131,6 +131,7 @@ int main()
 
     // メッシュ化
     BRepMesh_IncrementalMesh mesher(coneShape, 0.1); // 0.1はメッシュの精度
+    mesher.Perform();
 
     // 三角形分割を取得
     TopExp_Explorer faceExplorer(coneShape, TopAbs_FACE);
