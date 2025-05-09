@@ -76,6 +76,7 @@
         TKOpenGl.lib;
         TKService.lib;
         TKPrim.lib;
+        TKOffset.lib;
         TKSTEP.lib;
         TKSTEPAttr.lib;
         TKSTEP209.lib;

@@ -1,14 +1,18 @@
 #include <iostream>
 #include <BRepPrimAPI_MakeCone.hxx>
+#include <BRepOffsetAPI_ThruSections.hxx>
+#include <BRepBuilderAPI_MakeWire.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRep_Tool.hxx>
 #include <Poly_Triangulation.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopExp_Explorer.hxx>
+#include <gp_Pnt.hxx>
 #include "PolyProcessor.h"
 
-int main()
+int test()
 {
     // Define the vertices of a polygon (e.g., a square)
     TColgp_Array1OfPnt vertices(1, 4);
@@ -49,21 +53,50 @@ int main()
         triangulation->Triangle(i).Get(n1, n2, n3);
         std::cout << "  Triangle " << i << ": (" << n1 << ", " << n2 << ", " << n3 << ")" << std::endl;
     }
+    return 0;
+}
 
+int main()
+{
     // テーパー付き円柱（円錐台）のパラメータ
     double radiusBottom = 1.0; // 下部円の半径
     double radiusTop = 0.5;    // 上部円の半径
     double height = 2.0;       // 高さ
+    int numSegments = 50;      // 円周の分割数
 
-    // テーパー付き円柱（円錐台）を作成
-    BRepPrimAPI_MakeCone coneMaker(radiusBottom, radiusTop, height);
-    TopoDS_Shape coneShape = coneMaker.Shape();
+    // 下部円の輪郭を作成
+    BRepBuilderAPI_MakeWire bottomWire;
+    for (int i = 0; i < numSegments; ++i)
+    {
+        double angle1 = 2.0 * M_PI * i / numSegments;
+        double angle2 = 2.0 * M_PI * (i + 1) / numSegments;
+        gp_Pnt p1(radiusBottom * cos(angle1), radiusBottom * sin(angle1), 0.0);
+        gp_Pnt p2(radiusBottom * cos(angle2), radiusBottom * sin(angle2), 0.0);
+        bottomWire.Add(BRepBuilderAPI_MakeEdge(p1, p2));
+    }
+
+    // 上部円の輪郭を作成
+    BRepBuilderAPI_MakeWire topWire;
+    for (int i = 0; i < numSegments; ++i)
+    {
+        double angle1 = 2.0 * M_PI * i / numSegments;
+        double angle2 = 2.0 * M_PI * (i + 1) / numSegments;
+        gp_Pnt p1(radiusTop * cos(angle1), radiusTop * sin(angle1), height);
+        gp_Pnt p2(radiusTop * cos(angle2), radiusTop * sin(angle2), height);
+        topWire.Add(BRepBuilderAPI_MakeEdge(p1, p2));
+    }
+
+    // ThruSectionsで円柱を作成
+    BRepOffsetAPI_ThruSections thruSections(true, true);
+    thruSections.AddWire(bottomWire.Wire());
+    thruSections.AddWire(topWire.Wire());
+    thruSections.Build();
+    TopoDS_Shape coneShape = thruSections.Shape();
 
     // 三角形分割を取得
     TopExp_Explorer faceExplorer(coneShape, TopAbs_FACE);
     while (faceExplorer.More())
     {
-        // 修正: TopoDS::Face を TopoDS_Face にキャスト
         TopoDS_Face face = TopoDS::Face(faceExplorer.Current());
         Handle(Poly_Triangulation) triangulation = BRep_Tool::Triangulation(face, TopLoc_Location());
 
