@@ -74,6 +74,8 @@
         TKTopAlgo.lib;
         TKPrim.lib;
         TKOffset.lib;
+        TKMesh.lib;
+        TKMeshVS.lib;
         TKV3d.lib;
         TKOpenGl.lib;
         TKService.lib;

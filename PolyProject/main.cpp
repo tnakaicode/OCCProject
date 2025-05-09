@@ -19,6 +19,8 @@
 #include <gp_Pnt.hxx>
 #include <gp_Circ.hxx>
 #include <GC_MakeCircle.hxx>
+#include <BRepCheck_Analyzer.hxx>
+#include <BRepMesh_IncrementalMesh.hxx>
 #include "PolyProcessor.h"
 #include "Viewer.h"
 
@@ -124,6 +126,9 @@ int main()
 
     // Poly_Triangulationを格納するリスト
     std::vector<Handle(Poly_Triangulation)> triangulations;
+
+    // メッシュ化
+    BRepMesh_IncrementalMesh mesher(coneShape, 0.1); // 0.1はメッシュの精度
 
     // 三角形分割を取得
     TopExp_Explorer faceExplorer(coneShape, TopAbs_FACE);
