@@ -3,7 +3,8 @@
 #include <TColgp_Array1OfPnt.hxx>
 #include <TColStd_Array1OfInteger.hxx>
 
-class PolyProcessor {
+class PolyProcessor
+{
 public:
-    static Handle(Poly_Triangulation) CreateTriangulation(const TColgp_Array1OfPnt& vertices, const TColStd_Array1OfInteger& triangles);
+    static Handle(Poly_Triangulation) CreateTriangulation(const TColgp_Array1OfPnt &vertices, const TColStd_Array1OfInteger &indices);
 };
