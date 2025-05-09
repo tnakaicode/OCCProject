@@ -10,6 +10,8 @@
 #include <TopoDS_Face.hxx>
 #include <TopExp_Explorer.hxx>
 #include <gp_Pnt.hxx>
+#include <gp_Circ.hxx>
+#include <GC_MakeCircle.hxx>
 #include "PolyProcessor.h"
 
 int test()
@@ -62,35 +64,36 @@ int main()
     double radiusBottom = 1.0; // 下部円の半径
     double radiusTop = 0.5;    // 上部円の半径
     double height = 2.0;       // 高さ
-    int numSegments = 50;      // 円周の分割数
+
+    // 下部円を作成
+    gp_Ax2 bottomAx2(gp_Pnt(0.0, 0.0, 0.0), gp_Dir(0.0, 0.0, 1.0)); // 底面の座標系
+    gp_Circ bottomCircle(bottomAx2, radiusBottom);
+
+    // 上部円を作成
+    gp_Ax2 topAx2(gp_Pnt(0.0, 0.0, height), gp_Dir(0.0, 0.0, 1.0)); // 上面の座標系
+    gp_Circ topCircle(topAx2, radiusTop);
 
     // 下部円の輪郭を作成
-    BRepBuilderAPI_MakeWire bottomWire;
-    for (int i = 0; i < numSegments; ++i)
-    {
-        double angle1 = 2.0 * M_PI * i / numSegments;
-        double angle2 = 2.0 * M_PI * (i + 1) / numSegments;
-        gp_Pnt p1(radiusBottom * cos(angle1), radiusBottom * sin(angle1), 0.0);
-        gp_Pnt p2(radiusBottom * cos(angle2), radiusBottom * sin(angle2), 0.0);
-        bottomWire.Add(BRepBuilderAPI_MakeEdge(p1, p2));
-    }
+    Handle(Geom_Circle) geomBottomCircle = new Geom_Circle(bottomCircle);
+    TopoDS_Wire bottomWire = BRepBuilderAPI_MakeWire(BRepBuilderAPI_MakeEdge(geomBottomCircle));
 
     // 上部円の輪郭を作成
-    BRepBuilderAPI_MakeWire topWire;
-    for (int i = 0; i < numSegments; ++i)
-    {
-        double angle1 = 2.0 * M_PI * i / numSegments;
-        double angle2 = 2.0 * M_PI * (i + 1) / numSegments;
-        gp_Pnt p1(radiusTop * cos(angle1), radiusTop * sin(angle1), height);
-        gp_Pnt p2(radiusTop * cos(angle2), radiusTop * sin(angle2), height);
-        topWire.Add(BRepBuilderAPI_MakeEdge(p1, p2));
-    }
+    Handle(Geom_Circle) geomTopCircle = new Geom_Circle(topCircle);
+    TopoDS_Wire topWire = BRepBuilderAPI_MakeWire(BRepBuilderAPI_MakeEdge(geomTopCircle));
 
     // ThruSectionsで円柱を作成
-    BRepOffsetAPI_ThruSections thruSections(true, true);
-    thruSections.AddWire(bottomWire.Wire());
-    thruSections.AddWire(topWire.Wire());
+    BRepOffsetAPI_ThruSections thruSections(true, true, 1.0e-6); // Solid, ruled, precision
+    thruSections.AddWire(bottomWire);
+    thruSections.AddWire(topWire);
     thruSections.Build();
+
+    // 成功したかどうかを確認
+    if (!thruSections.IsDone())
+    {
+        std::cerr << "Error: ThruSections failed to build the shape." << std::endl;
+        return 1; // エラー終了
+    }
+
     TopoDS_Shape coneShape = thruSections.Shape();
 
     // 三角形分割を取得
