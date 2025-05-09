@@ -1,4 +1,9 @@
+#define _WIN32_WINNT 0x0601 // Target Windows 7 or later
+#include <windows.h>
 #include <iostream>
+#include <vector>
+#include <cmath>
+#include <array>
 #include <BRepPrimAPI_MakeCone.hxx>
 #include <BRepOffsetAPI_ThruSections.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
@@ -15,6 +20,7 @@
 #include <gp_Circ.hxx>
 #include <GC_MakeCircle.hxx>
 #include "PolyProcessor.h"
+#include "Viewer.h"
 
 int test()
 {
@@ -62,6 +68,12 @@ int test()
 
 int main()
 {
+    // Viewerの初期化
+    Handle(V3d_Viewer) viewer;
+    Handle(V3d_View) view;
+    Handle(AIS_InteractiveContext) context;
+    InitializeViewer("Poly Triangulation Viewer", viewer, view, context);
+
     // テーパー付き円柱（円錐台）のパラメータ
     double radiusBottom = 1.0; // 下部円の半径
     double radiusTop = 0.5;    // 上部円の半径
@@ -110,6 +122,9 @@ int main()
     std::cout << "Volume: " << volume << std::endl;
     std::cout << "Surface Area: " << surfaceArea << std::endl;
 
+    // Poly_Triangulationを格納するリスト
+    std::vector<Handle(Poly_Triangulation)> triangulations;
+
     // 三角形分割を取得
     TopExp_Explorer faceExplorer(coneShape, TopAbs_FACE);
     int faceIndex = 1; // 面のインデックス
@@ -128,29 +143,26 @@ int main()
         Handle(Poly_Triangulation) triangulation = BRep_Tool::Triangulation(face, TopLoc_Location());
         if (!triangulation.IsNull())
         {
-            // 頂点数と三角形数を出力
-            std::cout << "Number of Nodes: " << triangulation->NbNodes() << std::endl;
-            std::cout << "Number of Triangles: " << triangulation->NbTriangles() << std::endl;
-
-            // 頂点を出力
-            std::cout << "Vertices:" << std::endl;
-            for (int i = 1; i <= triangulation->NbNodes(); ++i)
-            {
-                gp_Pnt p = triangulation->Node(i);
-                std::cout << "  Vertex " << i << ": (" << p.X() << ", " << p.Y() << ", " << p.Z() << ")" << std::endl;
-            }
-
-            // 三角形を出力
-            std::cout << "Triangles:" << std::endl;
-            for (int i = 1; i <= triangulation->NbTriangles(); ++i)
-            {
-                Standard_Integer n1, n2, n3;
-                triangulation->Triangle(i).Get(n1, n2, n3);
-                std::cout << "  Triangle " << i << ": (" << n1 << ", " << n2 << ", " << n3 << ")" << std::endl;
-            }
+            triangulations.push_back(triangulation);
         }
-
         faceExplorer.Next();
+    }
+
+    // Viewerで描画
+    for (const auto &triangulation : triangulations)
+    {
+        DisplayPolyTriangulation(context, triangulation);
+    }
+
+    // Viewerを表示
+    view->FitAll();
+
+    // メッセージループ
+    MSG msg = {};
+    while (GetMessage(&msg, nullptr, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
     }
 
     return 0;

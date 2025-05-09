@@ -21,6 +21,8 @@
 #include <BRepPrimAPI_MakeBox.hxx>
 #include <BRepPrimAPI_MakeRevol.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
+#include <BRepBuilderAPI_MakeWire.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
 #include <Geom_Ellipse.hxx>
 #include <Geom_TrimmedCurve.hxx>
 #include <Geom_CartesianPoint.hxx>
@@ -484,4 +486,46 @@ void DisplayBSplineCurve(const Handle(AIS_InteractiveContext) & context,
     {
         std::cerr << "Error displaying B-Spline curve: " << e.GetMessageString() << std::endl;
     }
+}
+
+// Poly_TriangulationをTopoDS_Shapeに変換
+TopoDS_Shape ConvertPolyToShape(const Handle(Poly_Triangulation)& triangulation) {
+    BRep_Builder builder;
+    TopoDS_Compound compound;
+    builder.MakeCompound(compound);
+
+    for (int i = 1; i <= triangulation->NbTriangles(); ++i) {
+        Standard_Integer n1, n2, n3;
+        triangulation->Triangle(i).Get(n1, n2, n3);
+
+        gp_Pnt p1 = triangulation->Node(n1);
+        gp_Pnt p2 = triangulation->Node(n2);
+        gp_Pnt p3 = triangulation->Node(n3);
+
+        TopoDS_Edge edge1 = BRepBuilderAPI_MakeEdge(p1, p2);
+        TopoDS_Edge edge2 = BRepBuilderAPI_MakeEdge(p2, p3);
+        TopoDS_Edge edge3 = BRepBuilderAPI_MakeEdge(p3, p1);
+
+        TopoDS_Wire wire = BRepBuilderAPI_MakeWire(edge1, edge2, edge3);
+        TopoDS_Face face = BRepBuilderAPI_MakeFace(wire);
+
+        builder.Add(compound, face);
+    }
+
+    return compound;
+}
+
+// Poly_Triangulationを3Dビューアに描画
+void DisplayPolyTriangulation(const Handle(AIS_InteractiveContext)& context, const Handle(Poly_Triangulation)& triangulation) {
+    if (triangulation.IsNull()) {
+        std::cerr << "Error: Poly_Triangulation is null." << std::endl;
+        return;
+    }
+
+    // Poly_TriangulationをTopoDS_Shapeに変換
+    TopoDS_Shape polyShape = ConvertPolyToShape(triangulation);
+
+    // AIS_Shapeとして表示
+    Handle(AIS_Shape) aisShape = new AIS_Shape(polyShape);
+    context->Display(aisShape, Standard_True);
 }

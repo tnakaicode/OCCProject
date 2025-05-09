@@ -15,6 +15,7 @@
 #include <TColStd_Array1OfInteger.hxx>
 #include <gp_Pnt.hxx>
 #include <Quantity_Color.hxx>
+#include <Poly_Triangulation.hxx>
 #include <vector>
 #include <array>
 
@@ -52,5 +53,8 @@ void DisplayBSplineCurve(const Handle(AIS_InteractiveContext) & context,
                          const Quantity_Color *curveColor);
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+// Poly_Triangulationを3Dビューアに描画
+void DisplayPolyTriangulation(const Handle(AIS_InteractiveContext)& context, const Handle(Poly_Triangulation)& triangulation);
 
 #endif // VIEWER_H
