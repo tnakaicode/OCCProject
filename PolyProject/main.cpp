@@ -2,6 +2,7 @@
 #include <BRepPrimAPI_MakeCone.hxx>
 #include <BRep_Tool.hxx>
 #include <Poly_Triangulation.hxx>
+#include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopExp_Explorer.hxx>
@@ -62,7 +63,8 @@ int main()
     TopExp_Explorer faceExplorer(coneShape, TopAbs_FACE);
     while (faceExplorer.More())
     {
-        TopoDS_Face face = TopoDS::Face(static_cast<const TopoDS_Shape &>(faceExplorer.Current()));
+        // 修正: TopoDS::Face を TopoDS_Face にキャスト
+        TopoDS_Face face = TopoDS::Face(faceExplorer.Current());
         Handle(Poly_Triangulation) triangulation = BRep_Tool::Triangulation(face, TopLoc_Location());
 
         if (!triangulation.IsNull())
