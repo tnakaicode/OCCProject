@@ -77,16 +77,16 @@ int main()
     InitializeViewer("Poly Triangulation Viewer", viewer, view, context);
 
     // テーパー付き円柱（円錐台）のパラメータ
-    double radiusBottom = 1.0; // 下部円の半径
-    double radiusTop = 0.5;    // 上部円の半径
-    double height = 2.0;       // 高さ
+    double radiusBottom = 10.0; // 下部円の半径
+    double radiusTop = 5.0;     // 上部円の半径
+    double height = 8.0;        // 高さ
 
     // 下部円を作成
     gp_Ax2 bottomAx2(gp_Pnt(0.0, 0.0, 0.0), gp_Dir(0.0, 0.0, 1.0)); // 底面の座標系
     gp_Circ bottomCircle(bottomAx2, radiusBottom);
 
     // 上部円を作成
-    gp_Ax2 topAx2(gp_Pnt(0.0, 0.0, height), gp_Dir(0.0, 0.0, 1.0)); // 上面の座標系
+    gp_Ax2 topAx2(gp_Pnt(1.0, 2.0, height), gp_Dir(0.0, 0.1, 1.0)); // 上面の座標系
     gp_Circ topCircle(topAx2, radiusTop);
 
     // 下部円の輪郭を作成
