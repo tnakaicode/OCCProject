@@ -4,11 +4,15 @@
 #include <vector>
 #include <cmath>
 #include <array>
+
+// Include necessary Open CASCADE headers
+#include <BRep_Tool.hxx>
 #include <BRepPrimAPI_MakeCone.hxx>
 #include <BRepOffsetAPI_ThruSections.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
-#include <BRep_Tool.hxx>
+#include <BRepCheck_Analyzer.hxx>
+#include <BRepMesh_IncrementalMesh.hxx>
 #include <BRepGProp.hxx>
 #include <GProp_GProps.hxx>
 #include <Poly_Triangulation.hxx>
@@ -19,8 +23,6 @@
 #include <gp_Pnt.hxx>
 #include <gp_Circ.hxx>
 #include <GC_MakeCircle.hxx>
-#include <BRepCheck_Analyzer.hxx>
-#include <BRepMesh_IncrementalMesh.hxx>
 #include "PolyProcessor.h"
 #include "Viewer.h"
 
