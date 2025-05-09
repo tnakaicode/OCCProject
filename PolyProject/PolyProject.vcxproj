@@ -72,11 +72,11 @@
         TKGeomBase.lib;
         TKGeomAlgo.lib;
         TKTopAlgo.lib;
+        TKPrim.lib;
+        TKOffset.lib;
         TKV3d.lib;
         TKOpenGl.lib;
         TKService.lib;
-        TKPrim.lib;
-        TKOffset.lib;
         TKSTEP.lib;
         TKSTEPAttr.lib;
         TKSTEP209.lib;

@@ -4,6 +4,8 @@
 #include <BRepBuilderAPI_MakeWire.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRep_Tool.hxx>
+#include <BRepGProp.hxx>
+#include <GProp_GProps.hxx>
 #include <Poly_Triangulation.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
@@ -96,13 +98,34 @@ int main()
 
     TopoDS_Shape coneShape = thruSections.Shape();
 
+    // 体積と面積を計算
+    GProp_GProps props;
+    BRepGProp::VolumeProperties(coneShape, props); // 体積計算
+    double volume = props.Mass();                  // 体積は "Mass" として取得される
+
+    BRepGProp::SurfaceProperties(coneShape, props); // 面積計算
+    double surfaceArea = props.Mass();              // 面積も "Mass" として取得される
+
+    // 結果を出力
+    std::cout << "Volume: " << volume << std::endl;
+    std::cout << "Surface Area: " << surfaceArea << std::endl;
+
     // 三角形分割を取得
     TopExp_Explorer faceExplorer(coneShape, TopAbs_FACE);
+    int faceIndex = 1; // 面のインデックス
     while (faceExplorer.More())
     {
         TopoDS_Face face = TopoDS::Face(faceExplorer.Current());
-        Handle(Poly_Triangulation) triangulation = BRep_Tool::Triangulation(face, TopLoc_Location());
 
+        // 面積を計算
+        GProp_GProps faceProps;
+        BRepGProp::SurfaceProperties(face, faceProps);
+        double faceArea = faceProps.Mass(); // 面積は "Mass" として取得される
+
+        // 面の情報を出力
+        std::cout << "Face " << faceIndex << " Area: " << faceArea << std::endl;
+
+        Handle(Poly_Triangulation) triangulation = BRep_Tool::Triangulation(face, TopLoc_Location());
         if (!triangulation.IsNull())
         {
             // 頂点数と三角形数を出力
