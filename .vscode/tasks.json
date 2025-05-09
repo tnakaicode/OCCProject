@@ -159,5 +159,36 @@
                 "/property:Platform=x64"
             ],
         },
+        {
+            "label": "build-PolyProject",
+            "type": "shell",
+            "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "${workspaceFolder}/PolyProject/PolyProject.vcxproj",
+                "/property:Configuration=Debug",
+                "/property:Platform=x64"
+            ],
+            "presentation": {
+                "reveal": "always", // ターミナルを表示
+                "panel": "shared",  // 同じターミナルを使用
+                "clear": false      // ターミナルをクリアしない
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": ["$msCompile"]
+        },
+        {
+            "label": "clean-PolyProject",
+            "type": "shell",
+            "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "${workspaceFolder}/PolyProject/PolyProject.vcxproj",
+                "/t:Clean", // Clean タスクを実行
+                "/property:Configuration=Debug",
+                "/property:Platform=x64"
+            ],
+        },
     ]
 }
