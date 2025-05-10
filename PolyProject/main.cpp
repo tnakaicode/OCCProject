@@ -23,6 +23,7 @@
 #include <gp_Pnt.hxx>
 #include <gp_Circ.hxx>
 #include <GC_MakeCircle.hxx>
+#include <GC_MakeArcOfCircle.hxx>
 #include "PolyProcessor.h"
 #include "Viewer.h"
 
@@ -70,6 +71,39 @@ int test()
     return 0;
 }
 
+TopoDS_Wire CreateCicleWire(const gp_Ax2 &topAx2, double radiusTop, double alpha1, double alpha2)
+{
+    // 半円または部分円を作成
+    Handle(Geom_TrimmedCurve) geomTopArc = GC_MakeArcOfCircle(
+        gp_Circ(topAx2, radiusTop), alpha1, alpha2, true);
+
+    // 部分円の端点を取得
+    gp_Pnt startPoint = geomTopArc->StartPoint();
+    gp_Pnt endPoint = geomTopArc->EndPoint();
+
+    // `topAx2`の原点を取得
+    gp_Pnt toporigin = topAx2.Location();
+
+    // 部分円のエッジを作成
+    TopoDS_Edge topArcEdge = BRepBuilderAPI_MakeEdge(geomTopArc);
+
+    // ワイヤーを作成
+    if (std::abs(alpha2 - alpha1) < 2 * M_PI)
+    {
+        // 部分円の場合、原点を経由して端点を結ぶエッジを作成
+        TopoDS_Edge edgeToStart = BRepBuilderAPI_MakeEdge(toporigin, startPoint);
+        TopoDS_Edge edgeToEnd = BRepBuilderAPI_MakeEdge(toporigin, endPoint);
+
+        // 部分円と原点を経由するエッジをワイヤーでつなぐ
+        return BRepBuilderAPI_MakeWire(topArcEdge, edgeToStart, edgeToEnd);
+    }
+    else
+    {
+        // 完全な円の場合、エッジは不要
+        return BRepBuilderAPI_MakeWire(topArcEdge);
+    }
+}
+
 int main()
 {
     // Viewerの初期化
@@ -84,20 +118,19 @@ int main()
     double height = 8.0;        // 高さ
 
     // 下部円を作成
-    gp_Ax2 bottomAx2(gp_Pnt(0.0, 0.0, 0.0), gp_Dir(0.0, 0.0, 1.0)); // 底面の座標系
-    gp_Circ bottomCircle(bottomAx2, radiusBottom);
+    gp_Ax2 bottomAx2(gp_Pnt(0.0, 0.0, 0.0),
+                     gp_Dir(0.0, 0.0, 1.0),
+                     gp_Dir(1.0, 0.0, 0.0));
+    TopoDS_Wire bottomWire = CreateCicleWire(bottomAx2, radiusBottom, 0, M_PI * 2);
 
-    // 上部円を作成
-    gp_Ax2 topAx2(gp_Pnt(1.0, 2.0, height), gp_Dir(0.0, 0.1, 1.0)); // 上面の座標系
-    gp_Circ topCircle(topAx2, radiusTop);
-
-    // 下部円の輪郭を作成
-    Handle(Geom_Circle) geomBottomCircle = new Geom_Circle(bottomCircle);
-    TopoDS_Wire bottomWire = BRepBuilderAPI_MakeWire(BRepBuilderAPI_MakeEdge(geomBottomCircle));
-
-    // 上部円の輪郭を作成
-    Handle(Geom_Circle) geomTopCircle = new Geom_Circle(topCircle);
-    TopoDS_Wire topWire = BRepBuilderAPI_MakeWire(BRepBuilderAPI_MakeEdge(geomTopCircle));
+    // 上部円を作成（半円に変更）
+    gp_Ax2 topAx2(gp_Pnt(1.0, 2.0, height),
+                  gp_Dir(0.0, 0.1, 1.0),
+                  gp_Dir(0.0, 1.0, 0.0));
+    // 上部部分円のワイヤーを作成（例: 120度の部分円）
+    double alpha1 = M_PI * (-1 / 10);
+    double alpha2 = M_PI * (1 + 1 / 3.0);
+    TopoDS_Wire topWire = CreateCicleWire(topAx2, radiusTop, alpha1, alpha2);
 
     // ThruSectionsで円柱を作成
     BRepOffsetAPI_ThruSections thruSections(true, true, 1.0e-6); // Solid, ruled, precision
