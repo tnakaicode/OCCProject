@@ -31,32 +31,34 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>
-        C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\inc;
-        %(AdditionalIncludeDirectories)
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtCore;C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtGui;C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtWidgets;C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include;C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\inc;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>
-        C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\lib;
-        %(AdditionalLibraryDirectories)
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\lib;C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
         TKernel.lib;
         TKMath.lib;
-        TKG3d.lib;
         TKG2d.lib;
+        TKG3d.lib;
+        TKBRep.lib;
         TKGeomBase.lib;
         TKGeomAlgo.lib;
         TKTopAlgo.lib;
+        TKPrim.lib;
+        TKOffset.lib;
+        TKMesh.lib;
+        TKMeshVS.lib;
+        TKV3d.lib;
         TKOpenGl.lib;
         TKService.lib;
-        TKV3d.lib;
-        TKBRep.lib;
-        TKPrim.lib;
         TKSTEP.lib;
         TKSTEPAttr.lib;
+        TKSTEP209.lib;
         TKSTEPBase.lib;
+        TKXSBase.lib;
+        TKXDESTEP.lib;
+        TKXCAF.lib;
+        TKLCAF.lib;
         %(AdditionalDependencies)
       </AdditionalDependencies>
       <LinkStatus>true</LinkStatus>

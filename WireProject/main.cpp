@@ -2,27 +2,47 @@
 #include <TopoDS_Wire.hxx>
 #include <TopoDS_Face.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRep_Tool.hxx>
 #include <Geom2d_Curve.hxx>
 #include <Geom2d_TrimmedCurve.hxx>
 #include <TopExp_Explorer.hxx>
 #include <Standard_Real.hxx>
+#include <Geom_CylindricalSurface.hxx>
+#include <gp_Cylinder.hxx>
 
-TopoDS_Wire SurfaceWireToUVWire(const TopoDS_Face& face, const TopoDS_Wire& wire);
+#include "Viewer.h"
+#include "WireOnSurface.h"
 
-int main() {
-    // Setup test environment
-    TopoDS_Face testFace; // Initialize with a valid TopoDS_Face
-    TopoDS_Wire testWire; // Initialize with a valid TopoDS_Wire
+int main()
+{
+    // 円筒面の作成
+    Handle(Geom_CylindricalSurface) cylinder = new Geom_CylindricalSurface(gp_Ax3(), 5.0);
+    TopoDS_Face face = BRepBuilderAPI_MakeFace(cylinder->Cylinder(), 0, 2 * M_PI, -10, 10).Face();
 
-    // Call the function to test
-    TopoDS_Wire uvWire = SurfaceWireToUVWire(testFace, testWire);
+    // UV空間上の四角形の定義
+    std::vector<gp_Pnt2d> uvPoly = {
+        gp_Pnt2d(0, 1),
+        gp_Pnt2d(M_PI, 1),
+        gp_Pnt2d(M_PI, 5),
+        gp_Pnt2d(M_PI + M_PI / 4, 7),
+        gp_Pnt2d(M_PI + M_PI / 4, 1),
+        gp_Pnt2d(2 * M_PI, 1)};
 
-    // Output results (for testing purposes)
-    if (!uvWire.IsNull()) {
-        std::cout << "Successfully converted wire to UV wire." << std::endl;
-    } else {
-        std::cout << "Conversion to UV wire failed." << std::endl;
+    // UV空間上の多角形をサーフェス上のワイヤーに変換
+    TopoDS_Wire wire = UVPolygon2DToWireOnSurface(cylinder, uvPoly, false);
+
+    // サーフェス上のワイヤーをUV平面上のワイヤーに変換
+    TopoDS_Wire uvWire = SurfaceWireToUVWire(face, wire);
+
+    // 結果を出力
+    if (!uvWire.IsNull())
+    {
+        std::cout << "UV Wire successfully created." << std::endl;
+    }
+    else
+    {
+        std::cout << "Failed to create UV Wire." << std::endl;
     }
 
     return 0;

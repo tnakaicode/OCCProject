@@ -1,14 +1,28 @@
-#ifndef SURFACE_WIRE_TO_UV_WIRE_H
-#define SURFACE_WIRE_TO_UV_WIRE_H
+#ifndef WIRE_ON_SURFACE_H
+#define WIRE_ON_SURFACE_H
 
-#include <TopoDS_Face.hxx>
+#include <vector>
+#include <gp_Pnt2d.hxx>
 #include <TopoDS_Wire.hxx>
-#include <BRepBuilderAPI_MakeWire.hxx>
-#include <TopExp_Explorer.hxx>
-#include <BRep_Tool.hxx>
-#include <Geom2d_Curve.hxx>
-#include <Geom2d_TrimmedCurve.hxx>
+#include <TopoDS_Face.hxx>
+#include <Geom_Surface.hxx>
 
-TopoDS_Wire SurfaceWireToUVWire(const TopoDS_Face& face, const TopoDS_Wire& wire);
+// Function to create a wire from a 2D polygon in UV space on a surface
+TopoDS_Wire UVPolygon2DToWireOnSurface(const Handle(Geom_Surface) & surface,
+                                       const std::vector<gp_Pnt2d> &uvPoints,
+                                       bool close = true);
 
-#endif // SURFACE_WIRE_TO_UV_WIRE_H
+// Function to create a wire from a circle in UV space on a surface
+TopoDS_Wire UVCircleToWireOnSurface(const Handle(Geom_Surface) & surface,
+                                    const gp_Pnt2d &centerUV,
+                                    double radius,
+                                    int numSegments = 100);
+
+// Function to create a wire from a spline in UV space on a surface
+TopoDS_Wire UVSplineToWireOnSurface(const Handle(Geom_Surface) & surface,
+                                    const std::vector<gp_Pnt2d> &uvPoints);
+
+// Function to convert a wire on a surface to a wire in UV space
+TopoDS_Wire SurfaceWireToUVWire(const TopoDS_Face &face, const TopoDS_Wire &wire);
+
+#endif // WIRE_ON_SURFACE_H
