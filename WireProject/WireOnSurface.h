@@ -25,4 +25,7 @@ TopoDS_Wire UVSplineToWireOnSurface(const Handle(Geom_Surface) & surface,
 // Function to convert a wire on a surface to a wire in UV space
 TopoDS_Wire SurfaceWireToUVWire(const TopoDS_Face &face, const TopoDS_Wire &wire);
 
+// Function to check if points on an edge are on the given face
+bool AreEdgePointsOnFace(const TopoDS_Edge &edge, const TopoDS_Face &face, int numPoints = 10);
+
 #endif // WIRE_ON_SURFACE_H

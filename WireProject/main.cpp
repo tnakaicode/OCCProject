@@ -10,12 +10,18 @@
 #include <Standard_Real.hxx>
 #include <Geom_CylindricalSurface.hxx>
 #include <gp_Cylinder.hxx>
+#include <TopoDS.hxx>
 
-#include "Viewer.h"
 #include "WireOnSurface.h"
+#include "Viewer.h"
 
 int main()
 {
+    // Viewerの初期化
+    Handle(V3d_Viewer) viewer;
+    Handle(V3d_View) view;
+    Handle(AIS_InteractiveContext) context;
+
     // 円筒面の作成
     Handle(Geom_CylindricalSurface) cylinder = new Geom_CylindricalSurface(gp_Ax3(), 5.0);
     TopoDS_Face face = BRepBuilderAPI_MakeFace(cylinder->Cylinder(), 0, 2 * M_PI, -10, 10).Face();
@@ -31,6 +37,22 @@ int main()
 
     // UV空間上の多角形をサーフェス上のワイヤーに変換
     TopoDS_Wire wire = UVPolygon2DToWireOnSurface(cylinder, uvPoly, false);
+
+    // ワイヤー内のエッジを確認
+    for (TopExp_Explorer explorer(wire, TopAbs_EDGE); explorer.More(); explorer.Next())
+    {
+        TopoDS_Edge edge = TopoDS::Edge(explorer.Current());
+        std::cout << "Checking edge..." << std::endl;
+        bool result = AreEdgePointsOnFace(edge, face);
+        if (result)
+        {
+            std::cout << "All points on this edge are on the face." << std::endl;
+        }
+        else
+        {
+            std::cout << "Some points on this edge are NOT on the face." << std::endl;
+        }
+    }
 
     // サーフェス上のワイヤーをUV平面上のワイヤーに変換
     TopoDS_Wire uvWire = SurfaceWireToUVWire(face, wire);
