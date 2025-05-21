@@ -1,0 +1,5 @@
+x64/Debug/*
+*/x64/Debug/*
+
+viewer_config.txt
+version.txt
