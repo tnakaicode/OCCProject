@@ -77,6 +77,18 @@
           "ignoreFailures": true
         }
       ]
+    },
+    {
+      "name": "Run Gnuplot Script",
+      "type": "clr", // .NET Application
+      "request": "launch",
+      "program": "gnuplot.exe", // Path to gnuplot executable
+      "args": [
+        "-c",
+        "${file}"
+      ], // Pass the '-c' flag and the current file
+      "cwd": "${fileDirname}", // Set the working directory to the file's directory
+      "console": "integratedTerminal"
     }
   ]
 }
