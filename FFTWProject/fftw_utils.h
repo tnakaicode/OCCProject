@@ -13,7 +13,7 @@ void execute_fft(fftw_plan plan, fftw_complex *in, fftw_complex *out);
 void destroy_fft_plan(fftw_plan plan);
 
 // Function to allocate memory for complex data
-fftw_complex* allocate_complex_array(int n);
+fftw_complex *allocate_complex_array(int n);
 
 // Function to free allocated memory
 void free_complex_array(fftw_complex *array);

@@ -10,7 +10,8 @@
           "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtWidgets",
           "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtCore",
           "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtGui",
-          "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtQml"
+          "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtQml",
+          "c:/fftw-3.3.5-dll64"
         ],
       "defines": [
           "_DEBUG",
