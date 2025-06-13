@@ -1,5 +1,62 @@
 #include "fftw_utils.h"
 #include <cstdlib>
+#include <QString>
+
+double toHz(double value, const QString &unit)
+{
+    if (unit == "Hz")
+        return value;
+    else if (unit == "kHz")
+        return value * 1e3;
+    else if (unit == "MHz")
+        return value * 1e6;
+    else if (unit == "GHz")
+        return value * 1e9;
+    else
+        return value; // 未知の単位はそのまま
+}
+
+double fromHz(double value, const QString &unit)
+{
+    if (unit == "Hz")
+        return value;
+    else if (unit == "kHz")
+        return value * 1e-3;
+    else if (unit == "MHz")
+        return value * 1e-6;
+    else if (unit == "GHz")
+        return value * 1e-9;
+    else
+        return value; // 未知の単位はそのまま
+}
+
+double toSec(double value, const QString &unit)
+{
+    if (unit == "s")
+        return value;
+    else if (unit == "ms")
+        return value * 1e-3;
+    else if (unit == "us")
+        return value * 1e-6;
+    else if (unit == "ns")
+        return value * 1e-9;
+    else
+        return value; // 未知の単位はそのまま
+}
+
+double fromSec(double value, const QString &unit)
+{
+    if (unit == "s")
+        return value;
+    else if (unit == "ms")
+        return value * 1e3;
+    else if (unit == "us")
+        return value * 1e6;
+    else if (unit == "ns")
+        return value * 1e9;
+    else
+        return value; // 未知の単位はそのまま
+}
 
 fftw_plan create_fft_plan_1d(int n, fftw_complex *in, fftw_complex *out, int sign)
 {

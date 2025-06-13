@@ -2,6 +2,12 @@
 #define FFTW_UTILS_H
 
 #include <fftw3.h>
+#include <QString>
+
+double toHz(double value, const QString &unit);
+double fromHz(double value, const QString &unit);
+double toSec(double value, const QString &unit);
+double fromSec(double value, const QString &unit);
 
 // Function to create a 1D FFT plan
 fftw_plan create_fft_plan_1d(int n, fftw_complex *in, fftw_complex *out, int sign);

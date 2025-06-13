@@ -13,9 +13,26 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    const int N = 2048;          // FFTサイズ
-    const double fs = 1000000.0; // サンプリング周波数 1MHz
-    const double f = 10000.0;    // 信号周波数 10kHz
+    // サンプリング周波数
+    const double fs = 10.0;
+    QString fs_unit = "GHz";
+    double fs_Hz = toHz(fs, fs_unit);
+
+    // 周波数分解能
+    const double df = 1;
+    QString df_unit = "MHz";
+    double df_Hz = toHz(df, df_unit);
+
+    // 周波数分解能からFFTサイズを決定
+    // const int N = static_cast<int>(fs_Hz / 2 / df_Hz);
+
+    // FFTサイズ
+    const int N = 1024 * 1;
+
+    // 信号周波数 f0
+    const double f0 = 1.0;
+    QString f0_unit = "GHz";
+    double f0_Hz = toHz(f0, f0_unit);
 
     fftw_complex *in = allocate_complex_array(N);
     fftw_complex *out = allocate_complex_array(N);
@@ -23,8 +40,8 @@ int main(int argc, char *argv[])
     // 10kHzサイン波を入力
     for (int i = 0; i < N; ++i)
     {
-        double t = i / fs;
-        in[i][0] = sin(2.0 * M_PI * f * t);
+        double t = i / fs_Hz;
+        in[i][0] = sin(2.0 * M_PI * f0_Hz * t);
         in[i][1] = 0.0;
     }
 
@@ -32,7 +49,11 @@ int main(int argc, char *argv[])
     fftw_plan plan = create_fft_plan_1d(N, in, out, FFTW_FORWARD);
     execute_fft(plan, in, out);
 
-    MainWindow window(N, fs, f, in, out);
+    // 表示単位
+    QString f_unit = "MHz";
+    QString t_unit = "us";
+
+    MainWindow window(N, fs_Hz, f_unit, t_unit, in, out);
     window.show();
 
     destroy_fft_plan(plan);
