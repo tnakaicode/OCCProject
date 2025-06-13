@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     const int N = 2048;
-    const double fs = 100000.0; // サンプリング周波数 100kHz
-    const double f = 10000.0;   // 信号周波数 10kHz
+    const double fs = 1000000.0; // サンプリング周波数 1MHz
+    const double f = 10000.0;    // 信号周波数 10kHz
 
     fftw_complex *in = allocate_complex_array(N);
     fftw_complex *out = allocate_complex_array(N);
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     chart_freq->axes(Qt::Horizontal).first()->setTitleText("Frequency [Hz]");
     chart_freq->axes(Qt::Vertical).first()->setTitleText("Power [dBm]");
     auto yAxis_freq = qobject_cast<QtCharts::QValueAxis *>(chart_freq->axes(Qt::Vertical).first());
-    yAxis_freq->setRange(-100.0, 0.0);
+    yAxis_freq->setRange(-100.0, 50.0);
 
     CrosshairChartView *chartView_freq = new CrosshairChartView(chart_freq);
     chartView_freq->setRenderHint(QPainter::Antialiasing);
