@@ -2,6 +2,7 @@
 #include <QtCharts>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QPushButton>
 #include <fftw3.h>
 #include "fftw_utils.h"
 #include <cmath>
@@ -10,7 +11,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    const int N = 1024;
+    const int N = 2048;         // FFTのサンプル数
     const double fs = 100000.0; // サンプリング周波数 100kHz
     const double f = 10000.0;   // 信号周波数 10kHz
 
@@ -31,10 +32,15 @@ int main(int argc, char *argv[])
 
     // --- 時間波形（上） ---
     QtCharts::QLineSeries *series_time = new QtCharts::QLineSeries();
+    double min_val = in[0][0], max_val = in[0][0];
     for (int i = 0; i < N; ++i)
     {
         double t = i / fs * 1000.0; // ms表示
         series_time->append(t, in[i][0]);
+        if (in[i][0] < min_val)
+            min_val = in[i][0];
+        if (in[i][0] > max_val)
+            max_val = in[i][0];
     }
     QtCharts::QChart *chart_time = new QtCharts::QChart();
     chart_time->addSeries(series_time);
@@ -42,6 +48,14 @@ int main(int argc, char *argv[])
     chart_time->createDefaultAxes();
     chart_time->axes(Qt::Horizontal).first()->setTitleText("Time [ms]");
     chart_time->axes(Qt::Vertical).first()->setTitleText("Amplitude");
+    // Y軸レンジを最大・最小の1.1倍に設定
+    auto yAxis_time = qobject_cast<QtCharts::QValueAxis *>(chart_time->axes(Qt::Vertical).first());
+    double y_center = 0.5 * (max_val + min_val);
+    double y_half = 0.55 * (max_val - min_val);
+    if (y_half < 1e-6)
+        y_half = 1.0; // フラットな信号対策
+    yAxis_time->setRange(y_center - y_half, y_center + y_half);
+
     QtCharts::QChartView *chartView_time = new QtCharts::QChartView(chart_time);
     chartView_time->setRenderHint(QPainter::Antialiasing);
     chartView_time->setRubberBand(QtCharts::QChartView::RectangleRubberBand);
@@ -49,30 +63,45 @@ int main(int argc, char *argv[])
     // --- スペクトル（下） ---
     QtCharts::QLineSeries *series_freq = new QtCharts::QLineSeries();
     int N_half = N / 2;
+    const double R = 50.0; // 負荷インピーダンス [Ω]
     for (int k = 0; k <= N_half; ++k)
     {
         double freq = k * fs / N;
         double mag = sqrt(out[k][0] * out[k][0] + out[k][1] * out[k][1]) * 2.0 / N;
-        series_freq->append(freq, mag);
+        double power = (mag * mag) / R;                   // [W]
+        double dBm = 10.0 * log10(power / 0.001 + 1e-20); // [dBm]
+        series_freq->append(freq, dBm);
     }
     QtCharts::QChart *chart_freq = new QtCharts::QChart();
     chart_freq->addSeries(series_freq);
-    chart_freq->setTitle("FFT Spectrum (Amplitude)");
+    chart_freq->setTitle("FFT Spectrum (dBm)");
     chart_freq->createDefaultAxes();
     chart_freq->axes(Qt::Horizontal).first()->setTitleText("Frequency [Hz]");
-    chart_freq->axes(Qt::Vertical).first()->setTitleText("Amplitude");
+    chart_freq->axes(Qt::Vertical).first()->setTitleText("Power [dBm]");
+    // Y軸レンジを0〜-100dBmに固定
+    auto yAxis_freq = qobject_cast<QtCharts::QValueAxis *>(chart_freq->axes(Qt::Vertical).first());
+    yAxis_freq->setRange(-100.0, 10.0);
+
     QtCharts::QChartView *chartView_freq = new QtCharts::QChartView(chart_freq);
     chartView_freq->setRenderHint(QPainter::Antialiasing);
     chartView_freq->setRubberBand(QtCharts::QChartView::RectangleRubberBand);
 
+    // --- リセットボタン ---
+    QPushButton *resetButton = new QPushButton("Reset Zoom");
+    QObject::connect(resetButton, &QPushButton::clicked, [=]()
+                     {
+        chartView_time->chart()->zoomReset();
+        chartView_freq->chart()->zoomReset(); });
+
     // --- レイアウト ---
     QWidget window;
     QVBoxLayout *layout = new QVBoxLayout(&window);
+    layout->addWidget(resetButton);
     layout->addWidget(chartView_time);
     layout->addWidget(chartView_freq);
 
     window.setWindowTitle("FFT Signal & Spectrum");
-    window.resize(900, 700);
+    window.resize(900, 750);
     window.show();
 
     destroy_fft_plan(plan);
