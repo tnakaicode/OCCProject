@@ -33,16 +33,27 @@
     <ClCompile>
       <AdditionalIncludeDirectories>
         c:\fftw-3.3.5-dll64\;
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include;
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtCharts;
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtWidgets;
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtCore;
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtGui;
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtANGLE;
         %(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>
         c:\fftw-3.3.5-dll64\;
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\lib;
         %(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>
         libfftw3-3.lib;
+        Qt5Charts.lib;
+        Qt5Widgets.lib;
+        Qt5Core.lib;
+        Qt5Gui.lib;
         %(AdditionalDependencies)
       </AdditionalDependencies>
       <SubSystem>Console</SubSystem>
@@ -52,19 +63,30 @@
     <ClCompile>
       <AdditionalIncludeDirectories>
         c:\fftw-3.3.5-dll64\;
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include;
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtCharts;
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtWidgets;
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtCore;
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtGui;
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtANGLE;
         %(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>
         c:\fftw-3.3.5-dll64\;
+        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\lib;
         %(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>
         libfftw3-3.lib;
+        Qt5Charts.lib;
+        Qt5Widgets.lib;
+        Qt5Core.lib;
+        Qt5Gui.lib;
         %(AdditionalDependencies)
       </AdditionalDependencies>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
