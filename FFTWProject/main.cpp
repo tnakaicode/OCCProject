@@ -5,13 +5,14 @@
 #include <QPushButton>
 #include <fftw3.h>
 #include "fftw_utils.h"
+#include "crosshairchartview.h"
 #include <cmath>
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    const int N = 2048;         // FFTのサンプル数
+    const int N = 2048;
     const double fs = 100000.0; // サンプリング周波数 100kHz
     const double f = 10000.0;   // 信号周波数 10kHz
 
@@ -22,8 +23,8 @@ int main(int argc, char *argv[])
     for (int i = 0; i < N; ++i)
     {
         double t = i / fs;
-        in[i][0] = sin(2.0 * M_PI * f * t); // 実部
-        in[i][1] = 0.0;                     // 虚部
+        in[i][0] = sin(2.0 * M_PI * f * t);
+        in[i][1] = 0.0;
     }
 
     // FFT
@@ -48,28 +49,26 @@ int main(int argc, char *argv[])
     chart_time->createDefaultAxes();
     chart_time->axes(Qt::Horizontal).first()->setTitleText("Time [ms]");
     chart_time->axes(Qt::Vertical).first()->setTitleText("Amplitude");
-    // Y軸レンジを最大・最小の1.1倍に設定
     auto yAxis_time = qobject_cast<QtCharts::QValueAxis *>(chart_time->axes(Qt::Vertical).first());
     double y_center = 0.5 * (max_val + min_val);
     double y_half = 0.55 * (max_val - min_val);
     if (y_half < 1e-6)
-        y_half = 1.0; // フラットな信号対策
+        y_half = 1.0;
     yAxis_time->setRange(y_center - y_half, y_center + y_half);
 
-    QtCharts::QChartView *chartView_time = new QtCharts::QChartView(chart_time);
+    CrosshairChartView *chartView_time = new CrosshairChartView(chart_time);
     chartView_time->setRenderHint(QPainter::Antialiasing);
-    chartView_time->setRubberBand(QtCharts::QChartView::RectangleRubberBand);
 
     // --- スペクトル（下） ---
     QtCharts::QLineSeries *series_freq = new QtCharts::QLineSeries();
     int N_half = N / 2;
-    const double R = 50.0; // 負荷インピーダンス [Ω]
+    const double R = 50.0;
     for (int k = 0; k <= N_half; ++k)
     {
         double freq = k * fs / N;
         double mag = sqrt(out[k][0] * out[k][0] + out[k][1] * out[k][1]) * 2.0 / N;
-        double power = (mag * mag) / R;                   // [W]
-        double dBm = 10.0 * log10(power / 0.001 + 1e-20); // [dBm]
+        double power = (mag * mag) / R;
+        double dBm = 10.0 * log10(power / 0.001 + 1e-20);
         series_freq->append(freq, dBm);
     }
     QtCharts::QChart *chart_freq = new QtCharts::QChart();
@@ -78,13 +77,11 @@ int main(int argc, char *argv[])
     chart_freq->createDefaultAxes();
     chart_freq->axes(Qt::Horizontal).first()->setTitleText("Frequency [Hz]");
     chart_freq->axes(Qt::Vertical).first()->setTitleText("Power [dBm]");
-    // Y軸レンジを0〜-100dBmに固定
     auto yAxis_freq = qobject_cast<QtCharts::QValueAxis *>(chart_freq->axes(Qt::Vertical).first());
-    yAxis_freq->setRange(-100.0, 10.0);
+    yAxis_freq->setRange(-100.0, 0.0);
 
-    QtCharts::QChartView *chartView_freq = new QtCharts::QChartView(chart_freq);
+    CrosshairChartView *chartView_freq = new CrosshairChartView(chart_freq);
     chartView_freq->setRenderHint(QPainter::Antialiasing);
-    chartView_freq->setRubberBand(QtCharts::QChartView::RectangleRubberBand);
 
     // --- リセットボタン ---
     QPushButton *resetButton = new QPushButton("Reset Zoom");
