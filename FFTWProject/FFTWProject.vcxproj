@@ -95,8 +95,19 @@
         <ClCompile Include="fftw_utils.cpp" />
         <ClCompile Include="crosshairchartview.cpp" />
         <ClCompile Include="$(IntDir)\moc_crosshairchartview.cpp" />
+        <ClCompile Include="mainwindow.cpp" />
         <ClInclude Include="fftw_utils.h" />
+        <ClInclude Include="mainwindow.h" />
         <ClInclude Include="crosshairchartview.h" />
+        <CustomBuild Include="mainwindow.h">
+            <FileType>Document</FileType>
+            <Message>moc %(Filename).h</Message>
+            <Command>
+    "C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\bin\moc.exe" "%(FullPath)" -o "$(IntDir)moc_%(Filename).cpp"
+            </Command>
+            <Outputs>$(IntDir)moc_%(Filename).cpp</Outputs>
+        </CustomBuild>
+        <ClCompile Include="$(IntDir)\moc_mainwindow.cpp" />
         <CustomBuild Include="crosshairchartview.h">
             <FileType>Document</FileType>
             <Message>moc %(Filename).h</Message>
