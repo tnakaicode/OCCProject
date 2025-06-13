@@ -27,12 +27,21 @@ int main(int argc, char *argv[])
     // const int N = static_cast<int>(fs_Hz / 2 / df_Hz);
 
     // FFTサイズ
-    const int N = 1024 * 1;
+    const int N = 1024 * 2;
 
     // 信号周波数 f0
     const double f0 = 1.0;
+    const double a0 = 1.0;   // 振幅
+    const double phi0 = 0.0; // 位相
     QString f0_unit = "GHz";
     double f0_Hz = toHz(f0, f0_unit);
+
+    // 信号周波数 f1
+    const double f1 = 2.1;
+    const double a1 = 1.5;   // 振幅
+    const double phi1 = 0.0; // 位相
+    QString f1_unit = "GHz";
+    double f1_Hz = toHz(f1, f1_unit);
 
     fftw_complex *in = allocate_complex_array(N);
     fftw_complex *out = allocate_complex_array(N);
@@ -41,7 +50,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < N; ++i)
     {
         double t = i / fs_Hz;
-        in[i][0] = sin(2.0 * M_PI * f0_Hz * t);
+        in[i][0] = a0 * sin(2.0 * M_PI * f0_Hz * t + phi0) + a1 * sin(2.0 * M_PI * f1_Hz * t + phi1);
         in[i][1] = 0.0;
     }
 
@@ -50,7 +59,7 @@ int main(int argc, char *argv[])
     execute_fft(plan, in, out);
 
     // 表示単位
-    QString f_unit = "MHz";
+    QString f_unit = "GHz";
     QString t_unit = "us";
 
     MainWindow window(N, fs_Hz, f_unit, t_unit, in, out);
