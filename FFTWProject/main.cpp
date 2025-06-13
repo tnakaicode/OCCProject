@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    const int N = 2048;
+    const int N = 2048;          // FFTサイズ
     const double fs = 1000000.0; // サンプリング周波数 1MHz
     const double f = 10000.0;    // 信号周波数 10kHz
 
@@ -30,6 +30,8 @@ int main(int argc, char *argv[])
     // FFT
     fftw_plan plan = create_fft_plan_1d(N, in, out, FFTW_FORWARD);
     execute_fft(plan, in, out);
+
+    QWidget window;
 
     // --- 時間波形（上） ---
     QtCharts::QLineSeries *series_time = new QtCharts::QLineSeries();
@@ -56,9 +58,6 @@ int main(int argc, char *argv[])
         y_half = 1.0;
     yAxis_time->setRange(y_center - y_half, y_center + y_half);
 
-    CrosshairChartView *chartView_time = new CrosshairChartView(chart_time);
-    chartView_time->setRenderHint(QPainter::Antialiasing);
-
     // --- スペクトル（下） ---
     QtCharts::QLineSeries *series_freq = new QtCharts::QLineSeries();
     int N_half = N / 2;
@@ -80,7 +79,15 @@ int main(int argc, char *argv[])
     auto yAxis_freq = qobject_cast<QtCharts::QValueAxis *>(chart_freq->axes(Qt::Vertical).first());
     yAxis_freq->setRange(-100.0, 50.0);
 
-    CrosshairChartView *chartView_freq = new CrosshairChartView(chart_freq);
+    // --- ラベルを用意 ---
+    QLabel *label_time = new QLabel("X: , Y: ", &window);
+    QLabel *label_freq = new QLabel("X: , Y: ", &window);
+
+    // --- ChartView生成時にseriesとlabelを渡す ---
+    CrosshairChartView *chartView_time = new CrosshairChartView(chart_time, series_time, label_time, &window);
+    chartView_time->setRenderHint(QPainter::Antialiasing);
+
+    CrosshairChartView *chartView_freq = new CrosshairChartView(chart_freq, series_freq, label_freq, &window);
     chartView_freq->setRenderHint(QPainter::Antialiasing);
 
     // --- リセットボタン ---
@@ -91,10 +98,11 @@ int main(int argc, char *argv[])
         chartView_freq->chart()->zoomReset(); });
 
     // --- レイアウト ---
-    QWidget window;
     QVBoxLayout *layout = new QVBoxLayout(&window);
     layout->addWidget(resetButton);
+    layout->addWidget(label_time);
     layout->addWidget(chartView_time);
+    layout->addWidget(label_freq);
     layout->addWidget(chartView_freq);
 
     window.setWindowTitle("FFT Signal & Spectrum");
