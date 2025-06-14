@@ -13,7 +13,8 @@
           "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtQml",
           "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtCharts",
           "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtANGLE",
-          "c:/fftw-3.3.5-dll64"
+          "c:/fftw-3.3.5-dll64",
+          "~/vcpkg/installed/x64-windows/include"
         ],
       "defines": [
           "_DEBUG",

@@ -31,14 +31,19 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>
-        C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\inc;
+        $(VCPKG_ROOT)\installed\x64-windows\include;
+        $(VCPKG_ROOT)\installed\x64-windows\include\opencascade;
         %(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
       <AdditionalLibraryDirectories>
-        C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\lib;
+        $(VCPKG_ROOT)\installed\x64-windows\lib;
         %(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>
@@ -54,9 +59,6 @@
         TKV3d.lib;
         TKBRep.lib;
         TKPrim.lib;
-        TKSTEP.lib;
-        TKSTEPAttr.lib;
-        TKSTEPBase.lib;
         %(AdditionalDependencies)
       </AdditionalDependencies>
       <LinkStatus>true</LinkStatus>

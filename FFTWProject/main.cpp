@@ -1,17 +1,49 @@
 #include <cmath>
+#include <iostream>
 #include <fftw3.h>
 #include <QApplication>
 #include <QtCharts>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QPushButton>
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/point_generators_2.h>
+#include <Eigen/Dense>
 #include "fftw_utils.h"
 #include "crosshairchartview.h"
 #include "mainwindow.h"
 
+typedef CGAL::Simple_cartesian<double> Kernel;
+typedef Kernel::Point_2 Point_2;
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    Point_2 p(1.0, 2.0);
+    Point_2 q(4.0, 6.0);
+
+    double dist = std::sqrt(CGAL::squared_distance(p, q));
+    std::cout << "Distance: " << dist << std::endl;
+
+    // 2x2行列の作成
+    Eigen::Matrix2d mat;
+    mat << 1, 2,
+           3, 4;
+
+    // ベクトルの作成
+    Eigen::Vector2d vec(5, 6);
+
+    // 行列とベクトルの積
+    Eigen::Vector2d result = mat * vec;
+
+    std::cout << "Matrix:\n" << mat << std::endl;
+    std::cout << "Vector:\n" << vec << std::endl;
+    std::cout << "Result:\n" << result << std::endl;
+
+    // 固有値計算
+    Eigen::EigenSolver<Eigen::Matrix2d> solver(mat);
+    std::cout << "Eigenvalues:\n" << solver.eigenvalues() << std::endl;
 
     // サンプリング周波数
     const double fs = 10.0;
@@ -24,10 +56,13 @@ int main(int argc, char *argv[])
     double df_Hz = toHz(df, df_unit);
 
     // 周波数分解能からFFTサイズを決定
-    // const int N = static_cast<int>(fs_Hz / 2 / df_Hz);
+    int N1 = static_cast<int>(fs_Hz / df_Hz);
+    std::cout << "fs_Hz: " << fs_Hz << ", df_Hz: " << df_Hz << std::endl;
+    std::cout << "N: " << N1 << std::endl;
 
     // FFTサイズ
-    const int N = 1024 * 2;
+    const int N = 1024 * 20;
+    std::cout << "N: " << N << std::endl;
 
     // 信号周波数 f0
     const double f0 = 1.0;
