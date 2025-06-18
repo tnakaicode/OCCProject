@@ -283,3 +283,246 @@ Mode                 LastWriteTime         Length Name
 -a----        2022/11/12      1:37           1628 OpenGl_GraphicDriverFactory.hxx
 -a----        2022/11/12      1:37           2425 Vrml_OrthographicCamera.hxx
 ```
+
+https://github.com/microsoft/vcpkg/issues/31901
+
+This is target Visual Studio 17.6.1 and windows.
+After using static linking mostly till now I've generated a triplet that mixes static and dynamic libraries from vcpkg
+All seemed to be working and all is ok provided I build things from IDE.
+
+However when building from the command line using msbuild in some situations which i can't track done IncrementalClean is getting triggered on the dlls that have been deployed to the folder the exe is in. This happens with incremental builds. And not always, sometimes they there, sometime they disappear.
+Once this happens the only way to get them to reappear is a full rebuild. Either from the command line or the IDE.
+
+The Solution is also generating a couple of dlls. And these end up in the dependent exe's folder, and don't get removed.
+Only the dll's deployed from vcpkg are disappearing.
+
+I'm not using the manifest mode for vcpkg. There is single global installation.
+
+It sounds similar to:
+dotnet/msbuild#1054
+
+But I've had no success in trying to work around the problem.
+Any tips on where to look appreciated.
+
+My msbuild skills are lacking.
+
+
+The Solution is also generating a couple of dlls. And these end up in the dependent exe's folder, and don't get removed.
+Only the dll's deployed from vcpkg are disappearing.
+
+I don't understand what "only dlls deployed from vcpkg are disappearing" mean? Can you provide an example of what went wrong?
+
+
+My solution has a locally built dll.
+The dll from that "local" project remains the exe's output folder.
+But the dll's that came from teh vcpkg installation are deleted.
+
+
+My solution has a locally built dll. The dll from that "local" project remains the exe's output folder. But the dll's that came from teh vcpkg installation are deleted.
+
+Are the dll files in the vcpkg/install directory disappearing when recompiling?
+
+
+I have a solution that has the following projects:
+
+Static Lib - that uses vcpkg libs (some static & some dll)
+DLL lib - that doesn't use vcpkg at all
+Application that links the 2 local libs + also some vcpkg libs (some static & some dll)
+If I do a clean rebuild the application output directory (where the exe ends up) also gets the dlls
+from vcpkg and solution dll. Editing and building from the IDE all the dlls remain in place while either rebuilding or incremental builds.
+
+If I do the same things from the command line using msbuild. The dlls are present only if I do a rebuild.
+The solution dll is always present. But the dlls source from the vcpkg install have disappeared.
+I see a log message about incrementalClean deleting the vcpkg dlls from teh exe output folder.
+
+Opening the ide and doing a build, does NOT restore the dlls.
+
+Doing a full rebuild of the solution from either the command line OR the ide and the vcpkg dlls will reappear in the exe folder.
+
+The vcpkg install folder is all good.
+
+
+This is also happening to me. On first build or clean rebuild, all of the vcpkg dll's are in the correct place, and the solution runs. On successive rebuilds, or during packaging into an msixbundle, I run into the build log below:
+
+2>Target _CreateBundle:
+2> Skipping target "_CreateBundle" because all output files are up-to-date with respect to the input files.
+2>Target _GenerateAppxPackage:
+2> Deleting file "D:\ProjectName\buildtree\arm64\Release\ProjectName_uwp_installerinfo.log".
+2>Target IncrementalClean:
+2> Deleting file "D:\ProjectName\buildtree\arm64\Release\ProjectName_uwp\ProjectName_uwp.vcxproj.GenerateResource.Cache".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\ProjectName_1.9.7.0_scale-100.msix".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\ProjectName_1.9.7.0_scale-125.msix".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\ProjectName_1.9.7.0_scale-150.msix".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\ProjectName_1.9.7.0_scale-400.msix".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\abseil_dll.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\azure-core.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\libcurl.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\zlib1.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\azure-storage-blobs.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\azure-storage-common.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\datachannel.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\srtp2.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\libssl-3-arm64.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\libcrypto-3-arm64.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\juice.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\libprotobuf-lite.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\libprotobuf.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\re2.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\cares.dll".
+2> Deleting file "D:\ProjectName\buildtree\output\arm64\Release\ProjectName_uwp\jsoncpp.dll".
+2>Target FinalizeBuildStatus:
+2> Deleting file "D:\ProjectName\buildtree\arm64\Release\ProjectName_uwp\ProjectName.tlog\unsuccessfulbuild".
+2>
+2>Build succeeded.
+2> 0 Warning(s)
+2> 0 Error(s)
+2>
+
+All of these are dll's linked in through vcpkg, while other dll's I've specified in the linker for other non-vcpkg external libraries are left alone. All of these dll's are necessary for the project to run, obviously.
+
+
+My work around has been to insert the following <target/> into my vcxproj files.
+I just output a message as a reminder for the future when this breaks something else.
+I arrived at this thru random attempts with no real knowledge of how msbuild works.
+Need to be after the <import/>.
+
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+.....snip....
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="IncrementalClean">
+    <Message Text="IncrementalClean Overridden. This may have undesired long term problems." />
+  </Target>
+  <ItemGroup>
+....
+
+
+
+@jimwang118 I am also experiencing this issue, and would love to resolve it. It's happening on both installs of Visual Studio I have (Version 17.3.5 and also 17.7.0 Preview 3) on two different machines (one is my laptop, another is my desktop), so it's reproducible across systems as well.
+
+It happens whether I'm targeting either a local x86 build for the Hololens 2 Emulator, or an arm64 build for using on the Hololens 2 directly. It seems to be happening when doing a quick rebuild without source modifications. For example, in a sample workflow:
+
+Make Source modifications
+Build and Run using to debug, works great
+Upon trying to "Run" the deployment again, it deletes all of the "unused" files, which in this case is the dll files which were copied in the post-source changes build. After it runs the MBBuild config, it repackages/rebundles the PackageLayout, which in this case doesn't contain the dll's anymore. Upon trying to invoke the executable on the emulator/device/local, the dll's are missing from the package (because they had been deleted).
+The workaround I've had to use in order to make a build/test cycle work means that every time I want to start a debugging session, I have to make a minor source code change (even if it's just removing a blank line, saving, putting it back, saving) which triggers the MSBuild tasks to make sure to include the dll's coming from vcpkg. If I have no source modifications (in my own project), then it deletes the dll's that were previously copied from vcpkg, because it thinks it doesn't need them and they're useless artifacts.
+
+
+Side note: this issue occurs with and also without having incremental builds enabled.
+
+
++1 Me and my colleagues have experienced this issue as well (Visual Studio 17.7.0). For some it's rare but for others it happens very frequently. Seems random, but I guess it's whenever the IncrementalClean is triggered.
+
+
+See if this is dotnet/msbuild#9709
+
+
+same problem here. using the vcpkg, even a restarting will result in the deletion of the DLL files copied by vcpkg.
+
+two workarounds I found:
+
+make a small change for any cpp file before starting debug.
+disable vcpkg autodeploy dll and copy those dll files manually by yourself.
+
+
+
+A workaround I found:
+
+diff --git a/scripts/buildsystems/msbuild/vcpkg.targets b/scripts/buildsystems/msbuild/vcpkg.targets
+index c831b0fce..db7152fbd 100644
+--- a/scripts/buildsystems/msbuild/vcpkg.targets
++++ b/scripts/buildsystems/msbuild/vcpkg.targets
+@@ -199,7 +199,7 @@
+     </CreateProperty>
+   </Target>
+
+-  <Target Name="AppLocalFromInstalled" AfterTargets="CopyFilesToOutputDirectory" BeforeTargets="CopyLocalFilesOutputGroup;RegisterOutput"
++  <Target Name="AppLocalFromInstalled" AfterTargets="CopyFilesToOutputDirectory" BeforeTargets="CopyLocalFilesOutputGroup"
+           Condition="'$(_ZVcpkgClassicOrManifest)' == 'true' and '$(VcpkgApplocalDeps)' == 'true' and '$(LinkSkippedExecution)' != 'true' and '@(Link)' != ''">
+     <Message Text="[vcpkg] Starting VcpkgApplocalDeps" Importance="low" />
+     <PropertyGroup>
+I am uncertain about the consequences of this modification, but as of now, the behavior appears to be correct.
+
+
+
+My work around has been to insert the following <target/> into my vcxproj files. I just output a message as a reminder for the future when this breaks something else. I arrived at this thru random attempts with no real knowledge of how msbuild works. Need to be after the <import/>.
+
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+.....snip....
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="IncrementalClean">
+    <Message Text="IncrementalClean Overridden. This may have undesired long term problems." />
+  </Target>
+  <ItemGroup>
+....
+This fixed it for me but yeah IDK if this is the way to go. Please fix MSFT!!!
+
+### vcpkg DLLがMSBuildのIncrementalCleanで消える問題 まとめ
+
+---
+
+#### 【現象】
+
+- vcpkg経由で導入したDLL（例: zlib1.dll, libcurl.dllなど）が、**コマンドラインやMSIXパッケージ作成時のビルドで突然出力フォルダから消える**。
+- ローカルでビルドしたDLLは消えないが、vcpkg由来のDLLだけが消える。
+- IDEからのビルドでは発生しにくいが、コマンドラインや一部の再ビルド・パッケージング時に発生。
+- 一度消えると、**フルリビルドしないとDLLが復活しない**。
+
+---
+
+#### 【原因】
+
+- MSBuildの`IncrementalClean`ターゲットが「不要なファイル」と誤認し、vcpkgが自動コピーしたDLLを削除してしまう。
+- vcpkgのMSBuild連携（`vcpkg.targets`）のタイミングや、MSBuildのファイル追跡仕様が根本原因。
+- [dotnet/msbuild#9709](https://github.com/dotnet/msbuild/issues/9709) などMSBuild側の既知問題も関係。
+
+---
+
+#### 【既知の回避策・ワークアラウンド】
+
+1. **ソースコードに小さな変更を加えてからビルドする**  
+   → ファイルが「必要」と認識され、DLLが消えない。
+
+2. **vcpkgの自動DLLコピーを無効化し、DLLを手動でコピーする**  
+   → `VcpkgApplocalDeps`を無効化し、必要なDLLを自分で管理。
+
+3. **`IncrementalClean`ターゲットをプロジェクトで上書きする**  
+   `.vcxproj`の最後に以下を追加（ただし副作用に注意）:
+   ````xml
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+   <Target Name="IncrementalClean">
+     <Message Text="IncrementalClean Overridden. This may have undesired long term problems." />
+   </Target>
+   ````
+
+4. **vcpkgの`vcpkg.targets`をパッチする**  
+   [このコメント](https://github.com/microsoft/vcpkg/issues/31901#issuecomment-1854523842)のように  
+   `AppLocalFromInstalled`ターゲットの`BeforeTargets`から`RegisterOutput`を外す。
+
+---
+
+#### 【注意点】
+
+- どの回避策も**根本解決ではなく一時的なもの**です。
+- MSBuildやvcpkgのアップデートで仕様が変わる可能性があります。
+- 副作用（他のクリーン処理が効かなくなる等）に注意してください。
+
+---
+
+#### 【参考リンク】
+
+- [vcpkg issue #31901](https://github.com/microsoft/vcpkg/issues/31901)
+- [dotnet/msbuild#9709](https://github.com/dotnet/msbuild/issues/9709)
+
+---
+
+#### 【まとめ】
+
+- **vcpkg DLLが消えるのはMSBuildのIncrementalCleanの仕様とvcpkg連携のタイミング問題が原因**
+- **現状は手動コピーやターゲット上書きなどで回避するしかない**
+- **根本解決にはvcpkg/MSBuild側の修正を待つ必要がある**
+
+---
+
+**今すぐ安定させたい場合は、vcpkg DLLの手動コピー運用が一番安全です。**
