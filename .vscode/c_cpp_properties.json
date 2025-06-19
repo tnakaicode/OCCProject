@@ -5,16 +5,12 @@
       "includePath": [
           "${workspaceFolder}/**",
           "${workspaceFolder}/AppProject/**",
-          "C:/OpenCASCADE-7.7.0-vc14-64/opencascade-7.7.0/inc",
-          "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include",
-          "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtWidgets",
-          "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtCore",
-          "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtGui",
-          "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtQml",
-          "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtCharts",
-          "C:/OpenCASCADE-7.7.0-vc14-64/qt5.11.2-vc14-64/include/QtANGLE",
-          "c:/fftw-3.3.5-dll64",
-          "~/vcpkg/installed/x64-windows/include"
+          "${env:VCPKG_ROOT}/installed/x64-windows/include",
+          "${env:VCPKG_ROOT}/installed/x64-windows/include/qt5",
+          "${env:VCPKG_ROOT}/installed/x64-windows/include/qt5/QtCore",
+          "${env:VCPKG_ROOT}/installed/x64-windows/include/qt5/QtGui",
+          "${env:VCPKG_ROOT}/installed/x64-windows/include/qt5/QtWidgets",
+          "${env:VCPKG_ROOT}/installed/x64-windows/include/qt5/QtCharts"
         ],
       "defines": [
           "_DEBUG",

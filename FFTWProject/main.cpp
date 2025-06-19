@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    
+
     Point_2 p(1.0, 2.0);
     Point_2 q(4.0, 6.0);
 

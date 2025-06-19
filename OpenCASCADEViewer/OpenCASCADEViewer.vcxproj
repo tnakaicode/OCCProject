@@ -47,18 +47,6 @@
         %(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>
-        TKernel.lib;
-        TKMath.lib;
-        TKG3d.lib;
-        TKG2d.lib;
-        TKGeomBase.lib;
-        TKGeomAlgo.lib;
-        TKTopAlgo.lib;
-        TKOpenGl.lib;
-        TKService.lib;
-        TKV3d.lib;
-        TKBRep.lib;
-        TKPrim.lib;
         %(AdditionalDependencies)
       </AdditionalDependencies>
       <LinkStatus>true</LinkStatus>
@@ -72,4 +60,26 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="CopyRuntimeDlls" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <!-- コピー先ディレクトリ -->
+    <PropertyGroup>
+      <DeployDir>$(OutDir)</DeployDir>
+    </PropertyGroup>
+    <!-- Qt DLLの例 -->
+    <ItemGroup>
+      <QtDlls Include="$(VCPKG_ROOT)\installed\x64-windows\bin\Qt5*.dll" />
+      <FFTWdlls Include="$(VCPKG_ROOT)\installed\x64-windows\bin\libfftw3-3.dll" />
+      <OCCdlls Include="$(VCPKG_ROOT)\installed\x64-windows\bin\TK*.dll" />
+      <OtherDlls Include="$(VCPKG_ROOT)\installed\x64-windows\bin\zlib1.dll" />
+      <QtPlatforms Include="$(VCPKG_ROOT)\installed\x64-windows\bin\platforms\qwindows.dll" />
+    </ItemGroup>
+    <!-- DLLコピー -->
+    <Copy SourceFiles="@(QtDlls)" DestinationFolder="$(DeployDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(FFTWdlls)" DestinationFolder="$(DeployDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(OCCdlls)" DestinationFolder="$(DeployDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(OtherDlls)" DestinationFolder="$(DeployDir)" SkipUnchangedFiles="true" />
+    <!-- platformsディレクトリ作成＆コピー -->
+    <MakeDir Directories="$(DeployDir)platforms" />
+    <Copy SourceFiles="@(QtPlatforms)" DestinationFolder="$(DeployDir)platforms" SkipUnchangedFiles="true" />
+  </Target>
 </Project>
