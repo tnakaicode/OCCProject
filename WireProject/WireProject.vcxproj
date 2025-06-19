@@ -10,7 +10,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{96A2E68F-A4AA-4120-9529-5225F77A02FE}</ProjectGuid>
+    <ProjectGuid>{8BDD3052-9260-44F2-A4B5-D5B0E4A7D10E}</ProjectGuid>
     <RootNamespace>OpenCASCADEViewer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>

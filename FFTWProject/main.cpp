@@ -20,8 +20,6 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    
-
     Point_2 p(1.0, 2.0);
     Point_2 q(4.0, 6.0);
 
@@ -31,7 +29,7 @@ int main(int argc, char *argv[])
     // 2x2行列の作成
     Eigen::Matrix2d mat;
     mat << 1, 2,
-           3, 4;
+        3, 4;
 
     // ベクトルの作成
     Eigen::Vector2d vec(5, 6);
@@ -39,13 +37,17 @@ int main(int argc, char *argv[])
     // 行列とベクトルの積
     Eigen::Vector2d result = mat * vec;
 
-    std::cout << "Matrix:\n" << mat << std::endl;
-    std::cout << "Vector:\n" << vec << std::endl;
-    std::cout << "Result:\n" << result << std::endl;
+    std::cout << "Matrix:\n"
+              << mat << std::endl;
+    std::cout << "Vector:\n"
+              << vec << std::endl;
+    std::cout << "Result:\n"
+              << result << std::endl;
 
     // 固有値計算
     Eigen::EigenSolver<Eigen::Matrix2d> solver(mat);
-    std::cout << "Eigenvalues:\n" << solver.eigenvalues() << std::endl;
+    std::cout << "Eigenvalues:\n"
+              << solver.eigenvalues() << std::endl;
 
     // サンプリング周波数
     const double fs = 10.0;

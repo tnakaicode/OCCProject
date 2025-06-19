@@ -91,13 +91,13 @@
         <ClCompile Include="mainwindow.cpp" />
         <ClCompile Include="$(IntDir)\moc_mainwindow.cpp" />
         <ClInclude Include="fftw_utils.h" />
-        <ClInclude Include="mainwindow.h" />
-        <ClInclude Include="crosshairchartview.h" />
+        <!-- <ClInclude Include="mainwindow.h" /> ← これを削除 -->
+        <!-- <ClInclude Include="crosshairchartview.h" /> ← これを削除 -->
         <CustomBuild Include="mainwindow.h">
             <FileType>Document</FileType>
             <Message>moc %(Filename).h</Message>
             <Command>
-                "$(VCPKG_ROOT)\installed\x64-windows\tools\qt5\bin\moc.exe" "%(FullPath)" -o "$(IntDir)moc_%(Filename).cpp"
+            "$(VCPKG_ROOT)\installed\x64-windows\tools\qt5\bin\moc.exe" "%(FullPath)" -o "$(IntDir)moc_%(Filename).cpp"
             </Command>
             <Outputs>$(IntDir)moc_%(Filename).cpp</Outputs>
         </CustomBuild>
@@ -105,13 +105,10 @@
             <FileType>Document</FileType>
             <Message>moc %(Filename).h</Message>
             <Command>
-                "$(VCPKG_ROOT)\installed\x64-windows\tools\qt5\bin\moc.exe" "%(FullPath)" -o "$(IntDir)moc_%(Filename).cpp"
+            "$(VCPKG_ROOT)\installed\x64-windows\tools\qt5\bin\moc.exe" "%(FullPath)" -o "$(IntDir)moc_%(Filename).cpp"
             </Command>
             <Outputs>$(IntDir)moc_%(Filename).cpp</Outputs>
         </CustomBuild>
     </ItemGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-    <Target Name="RunAppLocalAfterClean" AfterTargets="IncrementalClean">
-        <CallTarget Targets="AppLocalFromInstalled" />
-    </Target>
 </Project>

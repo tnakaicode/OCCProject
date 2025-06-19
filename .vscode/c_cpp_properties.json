@@ -6,6 +6,7 @@
           "${workspaceFolder}/**",
           "${workspaceFolder}/AppProject/**",
           "${env:VCPKG_ROOT}/installed/x64-windows/include",
+          "${env:VCPKG_ROOT}/installed/x64-windows/include/opencascade",
           "${env:VCPKG_ROOT}/installed/x64-windows/include/qt5",
           "${env:VCPKG_ROOT}/installed/x64-windows/include/qt5/QtCore",
           "${env:VCPKG_ROOT}/installed/x64-windows/include/qt5/QtGui",
