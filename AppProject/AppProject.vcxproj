@@ -1,4 +1,5 @@
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build"
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -33,37 +34,29 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>
-        C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\inc;
-        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include;
-        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtWidgets;
-        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtCore;
-        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\include\QtGui;
+        $(VCPKG_ROOT)\installed\x64-windows\include;
+        $(VCPKG_ROOT)\installed\x64-windows\include\opencascade;
+        $(VCPKG_ROOT)\installed\x64-windows\include\Qt5;
+        $(VCPKG_ROOT)\installed\x64-windows\include\Qt5\QtGui;
+        $(VCPKG_ROOT)\installed\x64-windows\include\Qt5\QtCore;
+        $(VCPKG_ROOT)\installed\x64-windows\include\Qt5\QtWidgets;
+        $(VCPKG_ROOT)\installed\x64-windows\include\Qt5\QtCharts;
         %(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>
-        C:\OpenCASCADE-7.7.0-vc14-64\opencascade-7.7.0\win64\vc14\lib;
-        C:\OpenCASCADE-7.7.0-vc14-64\qt5.11.2-vc14-64\lib;
+        $(VCPKG_ROOT)\installed\x64-windows\lib;
         %(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>
-        TKernel.lib;
-        TKMath.lib;
-        TKBRep.lib;
-        TKGeomBase.lib;
-        TKGeomAlgo.lib;
-        TKPrim.lib;
-        TKTopAlgo.lib;
-        TKV3d.lib;
-        TKService.lib;
-        TKOpenGl.lib;
-        Qt5Core.lib;
-        Qt5Gui.lib;
-        Qt5Widgets.lib;
         %(AdditionalDependencies)
       </AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
+    <CallTarget Targets="AppLocalFromInstalled" />
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
